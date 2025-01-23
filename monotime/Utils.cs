@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 
 namespace TopDownShooter
 {
@@ -24,6 +25,8 @@ namespace TopDownShooter
 
             return true;
         }
+        
+        [Pure]
         public static Vector2 SafeNormalize(this Vector2 v, Vector2 defaultValue)
         {
             if (v == Vector2.Zero || v.HasNaNs())

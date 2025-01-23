@@ -1,2 +1,2 @@
-﻿using var game = new TopDownShooter.MyGame();
+﻿using var game = new TopDownShooter.Main();
 game.Run();

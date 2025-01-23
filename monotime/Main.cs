@@ -2,16 +2,15 @@
 
 namespace TopDownShooter
 {
-	public class MyGame : Game
+	public class Main : Game
 	{
 		private GraphicsDeviceManager graphics;
 		private SpriteBatch spriteBatch;
 		private Vector2 cameraPos;
-		private Player player;
-        private const float movementSpeed = 3f;
+		private const float movementSpeed = 3f;
 		private Vector2 inputAxis { get => GameManager.inputManager.inputAxis; }
 
-        public MyGame()
+		public Main()
 		{
 			graphics = new GraphicsDeviceManager(this);
 			Content.RootDirectory = "Content";
@@ -36,8 +35,8 @@ namespace TopDownShooter
 		{
 			ProcessInput();
 
-            GameManager.Update();
-            base.Update(gameTime);
+			GameManager.Update();
+			base.Update(gameTime);
 		}
 
 		protected override void Draw(GameTime gameTime)
@@ -46,9 +45,9 @@ namespace TopDownShooter
 			
 
 
-            spriteBatch.Begin();
-            GameManager.Draw(cameraPos);
-            spriteBatch.End();
+			spriteBatch.Begin();
+			GameManager.Draw(cameraPos);
+			spriteBatch.End();
 			
 			base.Draw(gameTime);
 		}
@@ -57,16 +56,14 @@ namespace TopDownShooter
 		{
 			Vector2 tempVector = Vector2.Zero;
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-            {
-                Exit();
-            }
+			if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+			{
+				Exit();
+			}
 
 			tempVector -= new Vector2(inputAxis.X, -inputAxis.Y);
 
-			tempVector.SafeNormalize(Vector2.Zero);
-            
-            cameraPos += tempVector * movementSpeed;
-        }
+            cameraPos += tempVector.SafeNormalize(Vector2.Zero) * movementSpeed;
+		}
 	}
 }
