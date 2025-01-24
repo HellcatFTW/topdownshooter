@@ -1,16 +1,11 @@
-﻿using TopDownShooter.Managers;
-
-namespace TopDownShooter
+﻿namespace TopDownShooter
 {
-	public class Main : Game
+    public sealed class Main : Game
 	{
 		private GraphicsDeviceManager graphics;
 		private SpriteBatch spriteBatch;
-		private Vector2 cameraPos;
-		private const float movementSpeed = 3f;
-		private Vector2 inputAxis { get => GameManager.inputManager.inputAxis; }
 
-		public Main()
+        public Main()
 		{
 			graphics = new GraphicsDeviceManager(this);
 			Content.RootDirectory = "Content";
@@ -35,7 +30,10 @@ namespace TopDownShooter
 		{
 			ProcessInput();
 
-			GameManager.Update();
+			Globals.gameTime = gameTime;
+			
+			Input.Update();
+            World.Update();
 			base.Update(gameTime);
 		}
 
@@ -43,10 +41,8 @@ namespace TopDownShooter
 		{
 			graphics.GraphicsDevice.Clear(Color.Black);
 			
-
-
 			spriteBatch.Begin();
-			GameManager.Draw(cameraPos);
+            World.Draw();
 			spriteBatch.End();
 			
 			base.Draw(gameTime);
@@ -54,16 +50,17 @@ namespace TopDownShooter
 
 		public void ProcessInput()
 		{
-			Vector2 tempVector = Vector2.Zero;
-
-			if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
 			{
 				Exit();
 			}
-
-			tempVector -= new Vector2(inputAxis.X, -inputAxis.Y);
-
-            cameraPos += tempVector.SafeNormalize(Vector2.Zero) * movementSpeed;
 		}
 	}
+    public static class LayerDepths
+    {
+		public const float Background = 0f;
+		public const float Entities = .1f;
+		public const float Projectiles = .2f;
+		public const float UI = .3f;
+    }
 }

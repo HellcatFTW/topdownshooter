@@ -1,6 +1,6 @@
 ﻿
 
-namespace TopDownShooter.World
+namespace TopDownShooter.Level
 {
     public class Tile
     {
@@ -16,7 +16,7 @@ namespace TopDownShooter.World
 
         public void Draw(Vector2 cameraPos)
         {
-            Globals.SpriteBatch.Draw(texture, position + cameraPos, Color.White);
+            Globals.SpriteBatch.Draw(texture, position - cameraPos, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, LayerDepths.Background);
         }
     }
 }
