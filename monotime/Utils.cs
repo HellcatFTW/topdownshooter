@@ -5,9 +5,12 @@ namespace TopDownShooter
 {
     public static class Utils
     {
+        [Pure]
         public static float ToRotation(this Vector2 v) => (float)Math.Atan2(v.Y, v.X);
+        [Pure]
         public static Vector2 ToRotationVector2(this float f) => new Vector2((float)Math.Cos(f), (float)Math.Sin(f));
 
+        [Pure]
         public static Vector2 RotatedBy(this Vector2 spinningpoint, double radians, Vector2 center = default(Vector2))
         {
             float cos = (float)Math.Cos(radians);
@@ -36,7 +39,7 @@ namespace TopDownShooter
         }
 
 
-
+        [Pure]
         /// <summary>
         /// Takes 2 vectors, and transfers the magnitude of the first to the second while maintaining direction.
         /// </summary>
@@ -50,6 +53,7 @@ namespace TopDownShooter
 
             return result;
         }
+        [Pure]
         public static Vector2 WithMagnitude(this Vector2 vector, float value)
         {
             return vector.SafeNormalize(Vector2.Zero) * value;

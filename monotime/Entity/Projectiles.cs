@@ -23,10 +23,6 @@ namespace TopDownShooter.Entity
 
             base.Update();
         }
-        public override void Draw()
-        {
-            base.Draw();
-        }
     }
 
     public sealed class EnemyShell : Projectile
@@ -46,10 +42,6 @@ namespace TopDownShooter.Entity
             position += velocity * Speed;
 
             base.Update();
-        }
-        public override void Draw()
-        {
-            base.Draw();
         }
     }
 }
