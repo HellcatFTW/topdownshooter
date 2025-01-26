@@ -1,7 +1,6 @@
-﻿using TopDownShooter.Entity;
+﻿using System.Collections.Generic;
+using TopDownShooter.Entity;
 using TopDownShooter.Level;
-using System.Collections.Generic;
-using System;
 
 namespace TopDownShooter
 {
@@ -17,6 +16,7 @@ namespace TopDownShooter
 
         private static float enemySpawnCooldown = 5f;
         private static float enemySpawnTimer = 0f;
+        private const int globalEnemySpawnLimit = 5;
 
         private static List<Projectile> projectiles = new List<Projectile>();
         private static List<Enemy> enemies = new List<Enemy>();
@@ -29,21 +29,20 @@ namespace TopDownShooter
             player.Update();
 
 
-            //TODO: implement spawn chances
+            //TODO: implement spawn chances of different enemies
             if (enemySpawnTimer > 0f)
             {
                 enemySpawnTimer -= (float)Globals.gameTime.ElapsedGameTime.TotalSeconds;
             }
-            if(enemySpawnTimer <= 0f)
+            if (enemySpawnTimer <= 0f && enemies.Count < globalEnemySpawnLimit)
             {
                 Enemy.NewEnemy<EnemyTank>();
                 enemySpawnTimer = enemySpawnCooldown;
             }
 
 
-
             UpdateProjectiles();
-            UpdateEnemies(); 
+            UpdateEnemies();
             RemoveProjectiles();
             RemoveEnemies();
         }

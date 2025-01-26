@@ -3,7 +3,7 @@ namespace TopDownShooter.Level
 {
     public sealed class Map
     {
-        private Vector2 mapSize = new Vector2(40,40);
+        private Vector2 mapSize = new Vector2(40, 40);
         private Vector2 mapCenter;
         private Texture2D texture;
         private Tile[,] tiles;
@@ -17,7 +17,7 @@ namespace TopDownShooter.Level
             {
                 for (int y = 0; y < mapSize.Y; y++)
                 {
-                   tiles[x,y] = new Tile(new Vector2(x * texture.Width, y * texture.Height) - mapCenter, texture);
+                    tiles[x, y] = new Tile(new Vector2(x * texture.Width, y * texture.Height) - mapCenter, texture);
                 }
             }
         }

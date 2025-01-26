@@ -28,7 +28,7 @@ namespace TopDownShooter
 
             return true;
         }
-        
+
         [Pure]
         public static Vector2 SafeNormalize(this Vector2 v, Vector2 defaultValue)
         {
@@ -37,7 +37,6 @@ namespace TopDownShooter
 
             return Vector2.Normalize(v);
         }
-
 
         [Pure]
         /// <summary>

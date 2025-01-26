@@ -14,7 +14,7 @@ namespace TopDownShooter.Entity
 
         private const float shootCooldown = 1.2f;
         private float shootTimer = 0;
-        
+
         private Vector2 DirectionToMouse { get => (World.MouseWorld - position).SafeNormalize(Vector2.Zero); }
         public Player()
         {
@@ -25,14 +25,18 @@ namespace TopDownShooter.Entity
         }
         public override void Update()
         {
-            Vector2 velocity = Vector2.Zero;
+            velocity = Vector2.Zero;
             velocity += new Vector2(Input.GetAxis.X, -Input.GetAxis.Y);
             position += velocity.SafeNormalize(Vector2.Zero) * movementSpeed;
+
+            hullRotation = Input.GetAxis != Vector2.Zero ? (float)Math.Atan2(Input.GetAxis.Y, -Input.GetAxis.X) - MathHelper.PiOver2 : hullRotation;
+            turretRotation = DirectionToMouse.ToRotation() + MathHelper.PiOver2;
+            rotation = hullRotation;
 
             World.cameraPos = position - new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2);
 
             if (shootTimer > 0f)
-            { 
+            {
                 shootTimer -= (float)Globals.gameTime.ElapsedGameTime.TotalSeconds;
             }
 
@@ -44,16 +48,8 @@ namespace TopDownShooter.Entity
         }
         public override void Draw()
         {
-            if (Input.GetAxis != Vector2.Zero)
-            {
-                hullRotation = (float)Math.Atan2(Input.GetAxis.Y, -Input.GetAxis.X) - MathHelper.PiOver2;
-            }
-
             Vector2 turretOrigin = new Vector2(TankTurretTexture.Width / 2, TankTurretTexture.Height / 2 + 9f); // 9 pixel offset to accommodate for the barrel and have proper rotation
             Vector2 hullOrigin = new Vector2(TankHullTexture.Width / 2, TankTurretTexture.Height / 2);
-
-            turretRotation = DirectionToMouse.ToRotation() + MathHelper.PiOver2;
-
 
             Globals.SpriteBatch.Draw(TankHullTexture, position - World.cameraPos, null, Color.White, hullRotation, hullOrigin, 1, SpriteEffects.None, LayerDepths.Entities);
 

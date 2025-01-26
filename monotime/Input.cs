@@ -8,7 +8,7 @@
         private static bool mouseLeft;
         public static bool MouseRight { get => mouseRight; }
         private static bool mouseRight;
-        
+
         public static void Update()
         {
             KeyboardState keyboard = Keyboard.GetState();

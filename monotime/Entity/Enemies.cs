@@ -1,4 +1,5 @@
-﻿
+﻿using System;
+
 namespace TopDownShooter.Entity
 {
     internal sealed class Enemies
@@ -13,15 +14,22 @@ namespace TopDownShooter.Entity
         protected float turretRotation = 0f;
         protected float hullRotation = 0f;
 
-        protected const float shootCooldown = 2f;
+        protected readonly float shootCooldown;
         protected float shootTimer = 0;
         private Vector2 DirectionToPlayer { get => (World.player.Position - position).SafeNormalize(Vector2.Zero); }
         protected override float MovementSpeed { get; set; } = 1;
 
+        private const float movementSwitchCooldown = 6f;
+        private float movementSwitchTimer = 0;
+        private bool movementIsSet = false;
+        private int movementMode;
+        private int TotalMovementModes { get => Enum.GetValues(typeof(MovementModes)).Length; }
         public EnemyTank()
         {
             TankHullTexture = Globals.Content.Load<Texture2D>("TankHull");
             TankTurretTexture = Globals.Content.Load<Texture2D>("TankTurret");
+
+            shootCooldown = Globals.Random.Next(2, 6);
         }
         public override void Update()
         {
@@ -29,14 +37,13 @@ namespace TopDownShooter.Entity
             //      - movement should be in 4-6 second long periods. 
             //      - preferably switch movement directions, don't use same one back to back.
 
-            Vector2 velocity = Vector2.Zero;
-            velocity += DirectionToPlayer;
-            position += velocity.SafeNormalize(Vector2.Zero) * MovementSpeed;
+            AI();
 
             turretRotation = DirectionToPlayer.ToRotation() + MathHelper.PiOver2;
             hullRotation = velocity.ToRotation() + MathHelper.PiOver2;
+            rotation = hullRotation;
 
-            if (shootTimer >= 0f)
+            if (shootTimer > 0f)
             {
                 shootTimer -= (float)Globals.gameTime.ElapsedGameTime.TotalSeconds;
             }
@@ -62,5 +69,56 @@ namespace TopDownShooter.Entity
 
             Projectile.NewProjectile<EnemyShell>(position + directionToPlayer * 50f, directionToPlayer);
         }
+        private void AI()
+        {
+            if (movementSwitchTimer >= 0)
+            {
+                movementSwitchTimer -= (float)Globals.gameTime.ElapsedGameTime.TotalSeconds;
+            }
+            if (movementSwitchTimer < 0)
+            {
+                movementMode = Globals.Random.Next(0, TotalMovementModes);
+                movementIsSet = false;
+                movementSwitchTimer = movementSwitchCooldown;
+            }
+
+            switch (movementMode)
+            {
+                case ((int)MovementModes.None):
+                    //do nothing?
+                    velocity = Vector2.Zero;
+                    break;
+                case ((int)MovementModes.ShowingSideToPlayer):
+                    // set movement 90 degrees off directionToPlayer for one frame, dont update
+                    if (!movementIsSet)
+                    {
+                        velocity = Vector2.Zero;
+                        velocity += DirectionToPlayer.RotatedBy(DirectionToPlayer.ToRotation() + MathHelper.PiOver2);
+                        movementIsSet = true;
+                    }
+
+                    break;
+                case ((int)MovementModes.TowardPlayer):
+                    // offset some +-45 degrees from direction to player, dont update
+                    if (!movementIsSet)
+                    {
+                        velocity = Vector2.Zero;
+                        velocity += DirectionToPlayer.RotatedBy(DirectionToPlayer.ToRotation() + Globals.Random.Next(0, 2) == 0 ? MathHelper.PiOver4 : -MathHelper.PiOver4);
+                        movementIsSet = true;
+                    }
+
+                    break;
+                default:
+                    throw new Exception("the movement code!! oh the horror");
+            }
+
+            position += velocity.SafeNormalize(Vector2.Zero) * MovementSpeed;
+        }
+    }
+    public enum MovementModes : int
+    {
+        None = 0,
+        ShowingSideToPlayer = 1,
+        TowardPlayer = 2,
     }
 }
