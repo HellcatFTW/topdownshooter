@@ -16,10 +16,10 @@ namespace TopDownShooter
             float cos = (float)Math.Cos(radians);
             float sin = (float)Math.Sin(radians);
             Vector2 vector = spinningpoint - center;
-            Vector2 result = center;
-            result.X += vector.X * cos - vector.Y * sin;
-            result.Y += vector.X * sin + vector.Y * cos;
-            return result;
+            Vector2 result = Vector2.Zero;
+            result.X = vector.X * cos - vector.Y * sin;
+            result.Y = vector.X * sin + vector.Y * cos;
+            return result + center;
         }
         public static bool HasNaNs(this Vector2 vec)
         {
