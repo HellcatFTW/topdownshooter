@@ -25,6 +25,7 @@ namespace TopDownShooter.Entity
             TankTurretTexture = Globals.Content.Load<Texture2D>("TankTurret");
 
             position = Vector2.Zero;
+            //TODO: figure out why enemy projectiles get instantly eaten if you sit in spawn
             hitBox = new HitBox(position, TankHullTexture.Bounds, 0);
         }
         public override void Update()
@@ -65,6 +66,11 @@ namespace TopDownShooter.Entity
             Globals.SpriteBatch.Draw(TankHullTexture, position - World.cameraPos, null, Color.White, hullRotation, hullOrigin, 1, SpriteEffects.None, LayerDepths.Entities);
 
             Globals.SpriteBatch.Draw(TankTurretTexture, position - World.cameraPos, null, Color.White, turretRotation, turretOrigin, 1, SpriteEffects.None, LayerDepths.Entities);
+
+            //foreach (var vertex in hitBox?.Vertices)
+            //{
+            //    Globals.SpriteBatch.DrawString(Globals.Content.Load<SpriteFont>("Arial"), ".", vertex - World.cameraPos, Color.White);
+            //}
         }
 
         public void Shoot()

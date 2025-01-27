@@ -102,7 +102,7 @@ namespace TopDownShooter.Entity
                     if (!movementIsSet)
                     {
                         velocity = Vector2.Zero;
-                        velocity += DirectionToPlayer.RotatedBy(DirectionToPlayer.ToRotation() + MathHelper.PiOver2);
+                        velocity += DirectionToPlayer.RotatedBy(MathHelper.PiOver2);
                         movementIsSet = true;
                     }
 
@@ -112,7 +112,7 @@ namespace TopDownShooter.Entity
                     if (!movementIsSet)
                     {
                         velocity = Vector2.Zero;
-                        velocity += DirectionToPlayer.RotatedBy(DirectionToPlayer.ToRotation() + Globals.Random.Next(0, 2) == 0 ? MathHelper.PiOver4 : -MathHelper.PiOver4);
+                        velocity += DirectionToPlayer.RotatedBy(Globals.Random.Next(0, 2) == 0 ? MathHelper.PiOver4 : -MathHelper.PiOver4);
                         movementIsSet = true;
                     }
 

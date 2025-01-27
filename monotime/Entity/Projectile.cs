@@ -30,6 +30,10 @@ namespace TopDownShooter.Entity
             Vector2 origin = new Vector2(texture.Width / 2, texture.Height / 2);
 
             Globals.SpriteBatch.Draw(texture, position - World.cameraPos, null, Color.White, rotation, origin, 1f, SpriteEffects.None, LayerDepths.Projectiles);
+            //foreach (var vertex in hitBox?.Vertices)
+            //{
+            //    Globals.SpriteBatch.DrawString(Globals.Content.Load<SpriteFont>("Arial"), ".", vertex - World.cameraPos, Color.Violet);
+            //}
         }
         public static T NewProjectile<T>(Vector2 position, Vector2 velocity) where T : Projectile, new()
         {
