@@ -1,4 +1,6 @@
-﻿namespace TopDownShooter
+﻿using System;
+
+namespace TopDownShooter
 {
     public sealed class Main : Game
     {
@@ -8,6 +10,7 @@
         public Main()
         {
             graphics = new GraphicsDeviceManager(this);
+            Globals.graphics = graphics;
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
             graphics.PreferredBackBufferWidth = 1920;
@@ -44,7 +47,6 @@
             spriteBatch.Begin();
             World.Draw();
             spriteBatch.End();
-
             base.Draw(gameTime);
         }
 

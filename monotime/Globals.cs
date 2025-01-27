@@ -10,6 +10,7 @@ namespace TopDownShooter
     public static class Globals
     {
         public static GameTime gameTime { get; set; }
+        public static GraphicsDeviceManager graphics {  get; set; }
         public static ContentManager Content { get; set; }
         public static SpriteBatch SpriteBatch { get; set; }
         public static Random Random { get => random; }
