@@ -28,6 +28,10 @@
 
         protected override void Update(GameTime gameTime)
         {
+            //if (!World.player.IsActive)
+            //{ 
+            //    Exit();
+            //}
             ProcessInput();
 
             Globals.gameTime = gameTime;

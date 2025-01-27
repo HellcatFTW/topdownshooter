@@ -1,10 +1,11 @@
 ﻿
 namespace TopDownShooter.Entity
 {
-    public abstract class Enemy : Entity
+    public abstract class Enemy : Entity, IHealth
     {
         protected abstract float MovementSpeed { get; set; }
-        public bool isActive = true;
+        public abstract float Health { get; }
+
         public Enemy()
         {
         }
@@ -25,5 +26,7 @@ namespace TopDownShooter.Entity
             World.RegisterEnemy(enemy);
             return enemy;
         }
+
+        public abstract void OnHit(Projectile projectile);
     }
 }

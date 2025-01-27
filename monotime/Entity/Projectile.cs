@@ -5,15 +5,15 @@ namespace TopDownShooter.Entity
     {
         protected Texture2D texture;
         protected abstract float Speed { get; set; }
-        protected abstract float Damage { get; set; }
-        protected abstract bool IsHostile { get; set; }
+        public abstract float Damage { get; }
+        public abstract bool IsHostile { get; }
         protected float lifeTime = 10f;
         protected float lifeTimer = 0f;
-        public bool isActive = true;
 
         public Projectile(Texture2D texture)
         {
             this.texture = texture;
+            hitBox = new HitBox(position, texture.Bounds, 0);
         }
         public override void Update()
         {
@@ -22,6 +22,7 @@ namespace TopDownShooter.Entity
             {
                 isActive = false;
             }
+            hitBox = new HitBox(position, texture.Bounds, rotation);
         }
         public override void Draw()
         {

@@ -43,6 +43,9 @@ namespace TopDownShooter
 
             UpdateProjectiles();
             UpdateEnemies();
+
+            ProcessCollisions();
+
             RemoveProjectiles();
             RemoveEnemies();
         }
@@ -53,6 +56,48 @@ namespace TopDownShooter
             DrawEnemies();
             DrawProjectiles();
         }
+
+        #region Collisions
+        public static void ProcessCollisions()
+        {
+            ProcessPlayerShootingEnemy();
+            ProcessEnemyShootingPlayer();
+        }
+
+        public static void ProcessPlayerShootingEnemy()
+        {
+            foreach (Enemy enemy in enemies)
+            {
+                foreach (Projectile projectile in projectiles)
+                {
+                    if (projectile.IsHostile)
+                    {
+                        continue;
+                    }
+                    if (enemy.CheckCollisionWith(projectile))
+                    {
+                        enemy.OnHit(projectile);
+                        projectile.Kill();
+                    }
+                }
+            }
+        }
+        public static void ProcessEnemyShootingPlayer()
+        {
+            foreach (Projectile projectile in projectiles)
+            {
+                if (!projectile.IsHostile)
+                {
+                    continue;
+                }
+                if (player.CheckCollisionWith(projectile))
+                {
+                    player.OnHit(projectile);
+                    projectile.Kill();
+                }
+            }
+        }
+        #endregion
 
         #region Enemy logic
         public static void RegisterEnemy(Enemy enemy)
@@ -77,7 +122,7 @@ namespace TopDownShooter
         {
             for (int i = 0; i < enemies.Count; i++)
             {
-                if (!enemies[i].isActive)
+                if (!enemies[i].IsActive)
                 {
                     enemies.RemoveAt(i);
                 }
@@ -108,7 +153,7 @@ namespace TopDownShooter
         {
             for (int i = 0; i < projectiles.Count; i++)
             {
-                if (!projectiles[i].isActive)
+                if (!projectiles[i].IsActive)
                 {
                     projectiles.RemoveAt(i);
                 }

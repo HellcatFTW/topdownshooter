@@ -2,7 +2,7 @@
 
 namespace TopDownShooter.Entity
 {
-    public sealed class Player : Entity
+    public sealed class Player : Entity, IHealth
     {
         private readonly Texture2D TankHullTexture;
         private readonly Texture2D TankTurretTexture;
@@ -16,15 +16,24 @@ namespace TopDownShooter.Entity
         private float shootTimer = 0;
 
         private Vector2 DirectionToMouse { get => (World.MouseWorld - position).SafeNormalize(Vector2.Zero); }
+        public float Health { get => health; }
+        private float health = 100f;
+
         public Player()
         {
             TankHullTexture = Globals.Content.Load<Texture2D>("TankHull");
             TankTurretTexture = Globals.Content.Load<Texture2D>("TankTurret");
 
             position = Vector2.Zero;
+            hitBox = new HitBox(position, TankHullTexture.Bounds, 0);
         }
         public override void Update()
         {
+            if(Health <= 0)
+            {
+                isActive = false;
+            }
+
             velocity = Vector2.Zero;
             velocity += new Vector2(Input.GetAxis.X, -Input.GetAxis.Y);
             position += velocity.SafeNormalize(Vector2.Zero) * movementSpeed;
@@ -32,6 +41,8 @@ namespace TopDownShooter.Entity
             hullRotation = Input.GetAxis != Vector2.Zero ? (float)Math.Atan2(Input.GetAxis.Y, -Input.GetAxis.X) - MathHelper.PiOver2 : hullRotation;
             turretRotation = DirectionToMouse.ToRotation() + MathHelper.PiOver2;
             rotation = hullRotation;
+
+            hitBox = new HitBox(position, TankHullTexture.Bounds, rotation);
 
             World.cameraPos = position - new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2);
 
@@ -59,6 +70,11 @@ namespace TopDownShooter.Entity
         public void Shoot()
         {
             Projectile.NewProjectile<PlayerShell>(position + DirectionToMouse * 50f, DirectionToMouse);
+        }
+
+        public void OnHit(Projectile projectile)
+        {
+            health -= projectile.Damage;
         }
     }
 }

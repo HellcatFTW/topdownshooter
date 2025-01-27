@@ -24,24 +24,33 @@ namespace TopDownShooter.Entity
         private bool movementIsSet = false;
         private int movementMode;
         private int TotalMovementModes { get => Enum.GetValues(typeof(MovementModes)).Length; }
+        public override float Health { get => health; }
+        private float health = 100;
+
         public EnemyTank()
         {
             TankHullTexture = Globals.Content.Load<Texture2D>("TankHull");
             TankTurretTexture = Globals.Content.Load<Texture2D>("TankTurret");
 
+            hitBox = new HitBox(position, TankHullTexture.Bounds, 0);
+
             shootCooldown = Globals.Random.Next(2, 6);
         }
         public override void Update()
         {
-            //TODO: - Enemies should choose some direction to move in relative to the player that is not *exactly* the opposite way.
-            //      - movement should be in 4-6 second long periods. 
-            //      - preferably switch movement directions, don't use same one back to back.
+            if(health <= 0)
+            {
+                isActive = false;
+                return;
+            }
 
             AI();
 
             turretRotation = DirectionToPlayer.ToRotation() + MathHelper.PiOver2;
             hullRotation = velocity.ToRotation() + MathHelper.PiOver2;
             rotation = hullRotation;
+
+            hitBox = new HitBox(position, TankHullTexture.Bounds, rotation);
 
             if (shootTimer > 0f)
             {
@@ -113,6 +122,11 @@ namespace TopDownShooter.Entity
             }
 
             position += velocity.SafeNormalize(Vector2.Zero) * MovementSpeed;
+        }
+
+        public override void OnHit(Projectile projectile)
+        {
+            health -= projectile.Damage;
         }
     }
     public enum MovementModes : int
