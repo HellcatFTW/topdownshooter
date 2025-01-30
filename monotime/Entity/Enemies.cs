@@ -46,12 +46,6 @@ namespace TopDownShooter.Entity
 
             AI();
 
-            turretRotation = DirectionToPlayer.ToRotation() + MathHelper.PiOver2;
-            hullRotation = velocity.ToRotation() + MathHelper.PiOver2;
-            rotation = hullRotation;
-
-            hitBox = new HitBox(position, TankHullTexture.Bounds, rotation);
-
             if (shootTimer > 0f)
             {
                 shootTimer -= (float)Globals.gameTime.ElapsedGameTime.TotalSeconds;
@@ -71,6 +65,10 @@ namespace TopDownShooter.Entity
             Globals.SpriteBatch.Draw(TankHullTexture, position - World.cameraPos, null, Color.White, hullRotation, hullOrigin, 1, SpriteEffects.None, LayerDepths.Entities);
 
             Globals.SpriteBatch.Draw(TankTurretTexture, position - World.cameraPos, null, Color.White, turretRotation, turretOrigin, 1, SpriteEffects.None, LayerDepths.Entities);
+            if (World.DebugMode && hitBox != null)
+            {
+                Utils.DrawHitbox(hitBox.Value);
+            }
         }
         public override void Shoot()
         {
@@ -80,6 +78,10 @@ namespace TopDownShooter.Entity
         }
         private void AI()
         {
+            turretRotation = DirectionToPlayer.ToRotation() + MathHelper.PiOver2;
+            hullRotation = velocity.ToRotation() + MathHelper.PiOver2;
+            rotation = hullRotation;
+
             if (movementSwitchTimer >= 0)
             {
                 movementSwitchTimer -= (float)Globals.gameTime.ElapsedGameTime.TotalSeconds;
@@ -97,31 +99,35 @@ namespace TopDownShooter.Entity
                     //do nothing?
                     velocity = Vector2.Zero;
                     break;
+
                 case ((int)MovementModes.ShowingSideToPlayer):
                     // set movement 90 degrees off directionToPlayer for one frame, dont update
                     if (!movementIsSet)
                     {
                         velocity = Vector2.Zero;
-                        velocity += DirectionToPlayer.RotatedBy(MathHelper.PiOver2);
+                        velocity += DirectionToPlayer.WithRotation(MathHelper.PiOver2).SafeNormalize(Vector2.Zero) * MovementSpeed;
                         movementIsSet = true;
                     }
 
                     break;
+
                 case ((int)MovementModes.TowardPlayer):
                     // offset some +-45 degrees from direction to player, dont update
                     if (!movementIsSet)
                     {
                         velocity = Vector2.Zero;
-                        velocity += DirectionToPlayer.RotatedBy(Globals.Random.Next(0, 2) == 0 ? MathHelper.PiOver4 : -MathHelper.PiOver4);
+                        velocity += DirectionToPlayer.WithRotation(Globals.Random.Next(0, 2) == 0 ? MathHelper.PiOver4 : -MathHelper.PiOver4).SafeNormalize(Vector2.Zero) * MovementSpeed;
                         movementIsSet = true;
                     }
 
                     break;
+
                 default:
                     throw new Exception("the movement code!! oh the horror");
             }
 
-            position += velocity.SafeNormalize(Vector2.Zero) * MovementSpeed;
+            MoveBy(velocity);
+            hitBox.Value.SetHitboxRotation(rotation);
         }
 
         public override void OnHit(Projectile projectile)

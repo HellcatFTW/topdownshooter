@@ -22,7 +22,7 @@ namespace TopDownShooter.Entity
             Vector2 spawnPosition = new Vector2(World.player.Position.X + Globals.Random.Next(0, spawnDistance), World.player.Position.Y + Globals.Random.Next(0, spawnDistance));
 
             T enemy = new T();
-            enemy.position = spawnPosition;
+            enemy.SetPosition(spawnPosition);
             World.RegisterEnemy(enemy);
             return enemy;
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 
 namespace TopDownShooter.Entity
 {
@@ -11,6 +12,7 @@ namespace TopDownShooter.Entity
         private float hullRotation = 0f;
 
         private const float movementSpeed = 3f;
+        private const float turnRate = .03f;
 
         private const float shootCooldown = 1.2f;
         private float shootTimer = 0;
@@ -25,7 +27,7 @@ namespace TopDownShooter.Entity
             TankTurretTexture = Globals.Content.Load<Texture2D>("TankTurret");
 
             position = Vector2.Zero;
-            //TODO: figure out why enemy projectiles get instantly eaten if you sit in spawn
+            rotation = MathHelper.PiOver2;
             hitBox = new HitBox(position, TankHullTexture.Bounds, 0);
         }
         public override void Update()
@@ -35,15 +37,9 @@ namespace TopDownShooter.Entity
                 isActive = false;
             }
 
-            velocity = Vector2.Zero;
-            velocity += new Vector2(Input.GetAxis.X, -Input.GetAxis.Y);
-            position += velocity.SafeNormalize(Vector2.Zero) * movementSpeed;
+            MoveAndTurn();
 
-            hullRotation = Input.GetAxis != Vector2.Zero ? (float)Math.Atan2(Input.GetAxis.Y, -Input.GetAxis.X) - MathHelper.PiOver2 : hullRotation;
-            turretRotation = DirectionToMouse.ToRotation() + MathHelper.PiOver2;
-            rotation = hullRotation;
-
-            hitBox = new HitBox(position, TankHullTexture.Bounds, rotation);
+            hitBox.Value.SetHitboxRotation(rotation);
 
             World.cameraPos = position - new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2);
 
@@ -66,13 +62,28 @@ namespace TopDownShooter.Entity
             Globals.SpriteBatch.Draw(TankHullTexture, position - World.cameraPos, null, Color.White, hullRotation, hullOrigin, 1, SpriteEffects.None, LayerDepths.Entities);
 
             Globals.SpriteBatch.Draw(TankTurretTexture, position - World.cameraPos, null, Color.White, turretRotation, turretOrigin, 1, SpriteEffects.None, LayerDepths.Entities);
-
-            //foreach (var vertex in hitBox?.Vertices)
-            //{
-            //    Globals.SpriteBatch.DrawString(Globals.Content.Load<SpriteFont>("Arial"), ".", vertex - World.cameraPos, Color.White);
-            //}
+            if (World.DebugMode && hitBox != null)
+            {
+                Utils.DrawHitbox(hitBox.Value);
+            }
         }
+        public void MoveAndTurn()
+        {
+            rotation += Input.GetAxis.Y >= 0 ? Input.GetAxis.X * turnRate : Input.GetAxis.X * -turnRate;
+            hullRotation = rotation - MathHelper.PiOver2;
+            turretRotation = DirectionToMouse.ToRotation() + MathHelper.PiOver2;
 
+            velocity = Vector2.Zero;
+            if (Input.GetAxis.Y > 0)
+            {
+                velocity += rotation.ToRotationVector2().WithRotation(MathHelper.Pi) * movementSpeed;
+            }
+            if (Input.GetAxis.Y < 0)
+            { 
+                velocity += rotation.ToRotationVector2() * movementSpeed;
+            }
+            MoveBy(velocity);
+        }
         public void Shoot()
         {
             Projectile.NewProjectile<PlayerShell>(position + DirectionToMouse * 50f, DirectionToMouse);

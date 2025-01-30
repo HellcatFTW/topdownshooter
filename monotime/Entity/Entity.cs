@@ -14,16 +14,32 @@ namespace TopDownShooter.Entity
         protected float rotation;
         public Vector2 Velocity { get => velocity; }
         protected Vector2 velocity;
-        #pragma warning disable CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
-        public HitBox? HitBoxBounds { get => hitBox; }
+        public HitBox? Hitbox { get => hitBox; }
         protected HitBox? hitBox;
-        #pragma warning restore CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
         public bool IsActive { get => isActive; }
         protected bool isActive = true;
         public abstract void Update();
 
         public abstract void Draw();
 
+        public virtual void MoveBy(Vector2 vector)
+        {
+            position += vector;
+            if (hitBox == null)
+            {
+                return;
+            }
+            hitBox.Value.MoveVerticesBy(vector);
+        }
+        public virtual void SetPosition(Vector2 newPosition)
+        {
+            position = newPosition;
+            if (hitBox == null)
+            {
+                return;
+            }
+            hitBox.Value.SetHitboxPosition(newPosition);
+        }
         public bool CheckCollisionWith(Entity entityToCheck)
         {
             if (hitBox == null || entityToCheck.hitBox == null)
@@ -31,7 +47,7 @@ namespace TopDownShooter.Entity
                 return false; 
             }
 
-            return HitBox.Intersect(HitBoxBounds?.Vertices, entityToCheck.HitBoxBounds?.Vertices);
+            return HitBox.Intersect(Hitbox.Value, entityToCheck.Hitbox.Value);
         }
     }
     public struct HitBox
@@ -39,8 +55,8 @@ namespace TopDownShooter.Entity
         public Vector2[] Vertices { get => vertices; }
         private Vector2[] vertices = new Vector2[4];
 
-        public float rotation;
-        private Vector2 origin;
+        public float Rotation { get => (vertices[1] - vertices[0]).ToRotation(); }
+        private Vector2 Origin { get => (vertices[2] + vertices[0]) / 2; }
 
         public HitBox(Vector2 position, Rectangle rectangle, float rotation)
         {
@@ -50,38 +66,58 @@ namespace TopDownShooter.Entity
             float x = position.X;
             float y = position.Y;
 
-            Vector2 Vertex1 = new Vector2(x, y);
-            Vector2 Vertex2 = new Vector2(x + width, y);
-            Vector2 Vertex3 = new Vector2(x + width, y + height);
-            Vector2 Vertex4 = new Vector2(x, y + height);
+            Vector2 Vertex0 = new Vector2(x, y);
+            Vector2 Vertex1 = new Vector2(x + width, y);
+            Vector2 Vertex2 = new Vector2(x + width, y + height);
+            Vector2 Vertex3 = new Vector2(x, y + height);
 
-            this.rotation = 0;
-            origin = new Vector2(width / 2, height / 2);
+            Vector2 origin = new Vector2(width / 2, height / 2);
 
-            vertices[0] = Vertex1 - origin;
-            vertices[1] = Vertex2 - origin;
-            vertices[2] = Vertex3 - origin;
-            vertices[3] = Vertex4 - origin;
+            vertices[0] = Vertex0 - origin;
+            vertices[1] = Vertex1 - origin;
+            vertices[2] = Vertex2 - origin;
+            vertices[3] = Vertex3 - origin;
 
-            ApplyRotationTransform(rotation);
+            SetHitboxRotation(rotation);
         }
-        public void ApplyRotationTransform(float radians)
+        public void SetHitboxRotation(float radians)
         {
-            Vector2 offset = vertices[0] + origin;
+            Vector2 oldOrigin = Origin;
+            float difference = radians - Rotation;
 
             for (int i = 0; i < vertices.Length; i++)
             {
-                vertices[i] = vertices[i].RotatedBy(radians - rotation, offset);
+                vertices[i] = vertices[i].WithRotation(difference, oldOrigin);
             }
-            rotation = radians;
         }
-        public static bool Intersect(Vector2[] hitbox1, Vector2[] hitbox2)
+        public void SetHitboxPosition(Vector2 newPosition)
         {
-            return SeparatingAxisTheorem(hitbox1, hitbox2) != null;
+            float oldRotation = Rotation;
+            float width = (vertices[0] - vertices[1]).Length();
+            float height = (vertices[0] - vertices[^1]).Length();
+            Vector2 oldOrigin = new Vector2(width / 2, height / 2); 
+
+            vertices[0] = newPosition - oldOrigin;
+            vertices[1] = vertices[0] + new Vector2(width, 0);
+            vertices[2] = vertices[0] + new Vector2(width, height);
+            vertices[3] = vertices[0] + new Vector2(0, height);
+
+            SetHitboxRotation(oldRotation);
         }
-        public static Vector2? MinimumTranslationVector(Vector2[] hitbox1, Vector2[] hitbox2)
+        public void MoveVerticesBy(Vector2 mtv)
         {
-            return SeparatingAxisTheorem(hitbox1, hitbox2);
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                vertices[i] += mtv;
+            }
+        }
+        public static bool Intersect(HitBox hitbox1, HitBox hitbox2)
+        {
+            return SeparatingAxisTheorem(hitbox1.Vertices, hitbox2.Vertices, out _) != null;
+        }
+        public static Vector2? MinimumTranslationVector(HitBox hitbox1, HitBox hitbox2, out Vector2? MTVStartingPoint)
+        {
+            return SeparatingAxisTheorem(hitbox1.Vertices, hitbox2.Vertices, out MTVStartingPoint);
         }
     }
     public interface IHealth

@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using TopDownShooter.Entity;
 
 namespace TopDownShooter
@@ -11,7 +13,7 @@ namespace TopDownShooter
         #endregion
         #region Vector2
         public static Vector2 ToRotationVector2(this float f) => new Vector2((float)Math.Cos(f), (float)Math.Sin(f));
-        public static Vector2 RotatedBy(this Vector2 spinningpoint, double radians, Vector2 center = default(Vector2))
+        public static Vector2 WithRotation(this Vector2 spinningpoint, double radians, Vector2 center = default(Vector2))
         {
             float cos = (float)Math.Cos(radians);
             float sin = (float)Math.Sin(radians);
@@ -65,7 +67,12 @@ namespace TopDownShooter
             vector = vector.WithMagnitude(value);
         }
         #endregion
-
+        #region Color
+        public static Color WithOpacity(this Color col, float val)
+        {
+            return new Color(col.R, col.G, col.B, (byte)MathHelper.Clamp(val * 255f, 0f, 255f));
+        }
+        #endregion
         #region Collision Math
 
         /// <summary>
@@ -75,75 +82,135 @@ namespace TopDownShooter
         /// <param name="ConvexShape1Vertices"></param>
         /// <param name="ConvexShape2Vertices"></param>
         /// <returns></returns>
-        public static Vector2? SeparatingAxisTheorem(Vector2[] ConvexShape1Vertices, Vector2[] ConvexShape2Vertices)
+        public static Vector2? SeparatingAxisTheorem(Vector2[] ConvexShape1Vertices, Vector2[] ConvexShape2Vertices, out Vector2? MTVStartingPoint)
         {
-            Vector2[] axesToTest = new Vector2[ConvexShape1Vertices.Length + ConvexShape2Vertices.Length];
-            
+            AxisBoolPair[] axesToTest = new AxisBoolPair[ConvexShape1Vertices.Length + ConvexShape2Vertices.Length];
+            MTVStartingPoint = null;
+
             Vector2[] normals1 = GetNormals(ConvexShape1Vertices);
             Vector2[] normals2 = GetNormals(ConvexShape2Vertices);
 
             for (int i = 0; i < ConvexShape1Vertices.Length; i++)
             {
-                axesToTest[i] = normals1[i];
+                axesToTest[i].Axis = normals1[i];
+                axesToTest[i].isFromFirstShape = true;
             }
             for (int i = ConvexShape1Vertices.Length; i < ConvexShape1Vertices.Length + ConvexShape2Vertices.Length; i++)
             {
-                axesToTest[i] = normals2[i - ConvexShape1Vertices.Length];
+                axesToTest[i].Axis = normals2[i - ConvexShape1Vertices.Length];
+                axesToTest[i].isFromFirstShape = false;
             }
             
             float minimumProjectionDifference = float.PositiveInfinity;
             Vector2 minimumTranslationAxis = Vector2.Zero;
 
-            foreach (Vector2 axis in axesToTest) // Which axis we are currently testing
+            foreach (AxisBoolPair axisBoolPair in axesToTest) // Which axis we are currently testing
             {
-                float minimumOfFirstShape = float.PositiveInfinity;
-                float maximumOfFirstShape = float.NegativeInfinity;
+                MinMaxPair firstShapeValues = new MinMaxPair();
+                MinMaxPair secondShapeValues = new MinMaxPair();
 
-                float minimumOfSecondShape = float.PositiveInfinity;
-                float maximumOfSecondShape = float.NegativeInfinity;
+                Vector2 axis = axisBoolPair.Axis;
+                bool isCurrentAxisFromFirstShape = axisBoolPair.isFromFirstShape;
 
                 foreach (Vector2 vertex in ConvexShape1Vertices) // get the lowest and highest result of projecting vertices of shape 1 onto the axis we are testing
                 {
                     float projectionLength = ProjectionLength(vertex, axis);
-                    maximumOfFirstShape = Math.Max(maximumOfFirstShape, projectionLength);
-                    minimumOfFirstShape = Math.Min(minimumOfFirstShape, projectionLength);
+                    firstShapeValues.UpdateValues(projectionLength, vertex);
                 }
                 foreach (Vector2 vertex in ConvexShape2Vertices) // get the lowest and highest result of projecting vertices of shape 2 onto the axis we are testing
                 {
                     float projectionLength = ProjectionLength(vertex, axis);
-                    maximumOfSecondShape = Math.Max(maximumOfSecondShape, projectionLength);
-                    minimumOfSecondShape = Math.Min(minimumOfSecondShape, projectionLength);
+                    secondShapeValues.UpdateValues(projectionLength,vertex);
                 }
 
-                if (minimumOfFirstShape < minimumOfSecondShape) // if first shape projection starts lower than second shape projection
+                if (firstShapeValues.minimum < secondShapeValues.minimum) // if first shape projection starts lower than second shape projection
                 {
-                    if (maximumOfFirstShape < minimumOfSecondShape)
+                    if (firstShapeValues.maximum < secondShapeValues.minimum)
                     {
                         return null; // 100% no collision
                     }
 
-                    if ((maximumOfFirstShape - minimumOfSecondShape) < minimumProjectionDifference) // if the intersection distance on current axis is lower than the minimum, store the axis responsible and the resulting minimum.
+                    if ((firstShapeValues.maximum - secondShapeValues.minimum) < minimumProjectionDifference) // if the intersection distance on current axis is lower than the minimum, store the axis responsible and the resulting minimum.
                     {
-                        minimumProjectionDifference = (maximumOfFirstShape - minimumOfSecondShape);
+                        minimumProjectionDifference = (firstShapeValues.maximum - secondShapeValues.minimum);
                         minimumTranslationAxis = axis;
+
+                        if (isCurrentAxisFromFirstShape)
+                        {
+                            MTVStartingPoint = secondShapeValues.vertexForMinimum;
+                        }
+                        else
+                        {
+                            MTVStartingPoint = firstShapeValues.vertexForMaximum;
+                        }
                     }
                 }
                 else // if second shape projection starts lower than first shape projection
                 {
-                    if (maximumOfSecondShape < minimumOfFirstShape)
+                    if (secondShapeValues.maximum < firstShapeValues.minimum)
                     {
                         return null; // 100% no collision
                     }
 
-                    if ((maximumOfSecondShape - minimumOfFirstShape) < minimumProjectionDifference) // if the intersection distance on current axis is lower than the minimum, store the axis responsible and the resulting minimum.
+                    if ((secondShapeValues.maximum - firstShapeValues.minimum) < minimumProjectionDifference) // if the intersection distance on current axis is lower than the minimum, store the axis responsible and the resulting minimum.
                     {
-                        minimumProjectionDifference = (maximumOfSecondShape - minimumOfFirstShape);
+                        minimumProjectionDifference = (secondShapeValues.maximum - firstShapeValues.minimum);
                         minimumTranslationAxis = -axis;
+
+                        if (isCurrentAxisFromFirstShape)
+                        {
+                            MTVStartingPoint = secondShapeValues.vertexForMaximum;
+                        }
+                        else
+                        {
+                            MTVStartingPoint = firstShapeValues.vertexForMinimum;
+                        }
                     }
                 }
             }
 
             return minimumProjectionDifference * minimumTranslationAxis; // Return minimum translation vector. move object by this amount and it's not intersecting anymore.
+        }
+        private struct MinMaxPair
+        {
+            public float minimum;
+            public float maximum;
+
+            public Vector2 vertexForMinimum;
+            public Vector2 vertexForMaximum;
+
+            public MinMaxPair()
+            {
+                minimum = float.PositiveInfinity;
+                maximum = float.NegativeInfinity;
+
+                vertexForMinimum = new Vector2();
+                vertexForMaximum = new Vector2();
+            }
+            public void UpdateValues(float value, Vector2 vertex)
+            {
+                if (value < minimum)
+                {
+                    minimum = value;
+                    vertexForMinimum = vertex;
+                }
+                if (value > maximum)
+                {
+                    maximum = value;
+                    vertexForMaximum = vertex;
+                }
+            }
+        }
+        private struct AxisBoolPair
+        {
+            public Vector2 Axis;
+            public bool isFromFirstShape;
+
+            public AxisBoolPair()
+            { 
+                Axis = new Vector2();
+                isFromFirstShape = false;
+            }
         }
         /// <summary>
         /// Returns length of vector onto axis.
@@ -161,7 +228,7 @@ namespace TopDownShooter
             Vector2[] normals = new Vector2[vertices.Length];
             for (int i = 0; i < vertices.Length; i++)
             {
-                normals[i] = edges[i].RotatedBy(MathHelper.PiOver2).SafeNormalize();
+                normals[i] = edges[i].WithRotation(MathHelper.PiOver2).SafeNormalize();
             }
             return normals;
         }
@@ -175,5 +242,66 @@ namespace TopDownShooter
             return edges;
         }
         #endregion
+
+        public static void DrawHitbox(HitBox hitbox, Color color = default(Color))
+        {
+            if (color == default(Color))
+            {
+                color = Color.DarkRed;
+            }
+            color = color.WithOpacity(.7f);
+
+            Texture2D pixelTexture = GenerateTexture(1, 1, color);
+
+            Rectangle rect = new(x: (int)hitbox.Vertices[0].X - ((int)World.cameraPos.X),
+                                 y: (int)hitbox.Vertices[0].Y - ((int)World.cameraPos.Y),
+                                 width: (int)(hitbox.Vertices[0] - hitbox.Vertices[1]).Length(),
+                                 height: (int)(hitbox.Vertices[0] - hitbox.Vertices[^1]).Length());
+
+            Globals.SpriteBatch.Draw(pixelTexture, rect, null, color, hitbox.Rotation, Vector2.Zero, SpriteEffects.None, LayerDepths.UI);
+        }
+        public static void DrawLine(Vector2 vectorToDraw, Vector2 startingPoint, Color color = default(Color))
+        {
+            if (color == default(Color))
+            {
+                color = Color.Red;
+            }
+
+            float rotation = vectorToDraw.ToRotation();
+
+            Texture2D pixelTexture = GenerateTexture(1, 1, color);
+
+            Vector2 startingDrawPos =  startingPoint - World.cameraPos;
+            int startX = ((int)startingDrawPos.X);
+            int startY = ((int)startingDrawPos.Y);
+
+            Rectangle rect = new(x: startX,
+                                 y: startY,
+                                 width: ((int)(vectorToDraw).Length()),
+                                 height: 1);
+
+            Globals.SpriteBatch.Draw(pixelTexture, rect, null, color, rotation, Vector2.Zero, SpriteEffects.None, LayerDepths.UI);
+        }
+        public static void DrawPixel(Vector2 position, Color color = default(Color))
+        {
+            if (color == default(Color))
+            {
+                color = Color.White;
+            }
+            Texture2D pixelTexture = GenerateTexture(1, 1, color);
+            Globals.SpriteBatch.Draw(pixelTexture, position, color);
+        }
+        public static Texture2D GenerateTexture(int width, int height, Color color)
+        {
+            Texture2D texture = new Texture2D(Globals.graphics.GraphicsDevice, width, height);
+
+            Color[] data = new Color[width*height];
+            for (int pixel = 0; pixel < data.Length; pixel++)
+            {
+                data[pixel] = color;
+            }
+            texture.SetData(data);
+            return texture;
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TopDownShooter.Entity;
 using TopDownShooter.Level;
 
@@ -18,6 +19,8 @@ namespace TopDownShooter
         private static float enemySpawnTimer = 0f;
         private const int globalEnemySpawnLimit = 5;
 
+        public static bool DebugMode = true;
+
         private static List<Projectile> projectiles = new List<Projectile>();
         private static List<Enemy> enemies = new List<Enemy>();
         public static void Update()
@@ -29,7 +32,7 @@ namespace TopDownShooter
             player.Update();
 
 
-            //TODO: implement spawn chances of different enemies
+            ////TODO: implement spawn chances of different enemies
             if (enemySpawnTimer > 0f)
             {
                 enemySpawnTimer -= (float)Globals.gameTime.ElapsedGameTime.TotalSeconds;
@@ -62,6 +65,8 @@ namespace TopDownShooter
         {
             ProcessPlayerShootingEnemy();
             ProcessEnemyShootingPlayer();
+            ProcessPlayerToEnemyCollisions();
+            ProcessEnemyToEnemyCollisions();
         }
 
         public static void ProcessPlayerShootingEnemy()
@@ -94,6 +99,58 @@ namespace TopDownShooter
                 {
                     player.OnHit(projectile);
                     projectile.Kill();
+                }
+            }
+        }
+
+        public static void ProcessPlayerToEnemyCollisions()
+        {
+            if (player.Hitbox == null)
+            {
+                return;
+            }
+            foreach (Enemy enemy in enemies)
+            {
+                if (enemy.Hitbox == null)
+                {
+                    continue;
+                }
+
+                Vector2? mtv = HitBox.MinimumTranslationVector(player.Hitbox.Value, enemy.Hitbox.Value, out _);
+
+                if (mtv == null)
+                {
+                    continue;
+                }
+
+                enemy.MoveBy(mtv.Value);
+            }
+        }
+        public static void ProcessEnemyToEnemyCollisions()
+        {
+            foreach (Enemy enemy in enemies)
+            {
+                if (enemy.Hitbox == null)
+                { 
+                    continue;
+                }
+                foreach (Enemy otherEnemy in enemies)
+                {
+                    if (enemy == otherEnemy)
+                    {
+                        continue;
+                    }
+                    if (otherEnemy.Hitbox == null)
+                    {
+                        continue;
+                    }
+                    Vector2? mtv = HitBox.MinimumTranslationVector(enemy.Hitbox.Value, otherEnemy.Hitbox.Value, out _);
+                    if (mtv == null)
+                    {
+                        continue;
+                    }
+
+                    otherEnemy.MoveBy(mtv.Value);
                 }
             }
         }
