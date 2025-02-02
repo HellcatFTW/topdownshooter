@@ -33,7 +33,7 @@ namespace TopDownShooter.Level
             {
                 for (int y = 0; y < mapTexture.Height; y++)
                 {
-                    Color currentColor = colorArray[x * mapTexture.Width + y];   
+                    Color currentColor = colorArray[x * mapTexture.Width + y];
 
                     if (currentColor.R <= 50 && currentColor.G >= 200 && currentColor.B <= 50)
                     {
@@ -60,7 +60,7 @@ namespace TopDownShooter.Level
             {
                 for (int y = 0; y <= tileIndex.GetUpperBound(1); y++)
                 {
-                    Vector2 tilePosition = new Vector2(x * tileWidth, y * tileHeight) - World.cameraPos;
+                    Vector2 tilePosition = new Vector2(y * tileHeight, x * tileWidth) - World.cameraPos; // these are backwards because the map is flipped weird.
 
                     switch (tileIndex[x, y])
                     {
