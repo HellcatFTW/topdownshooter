@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TopDownShooter.Entity;
 using TopDownShooter.Level;
 
@@ -7,7 +6,8 @@ namespace TopDownShooter
 {
     public static class World
     {
-        public static readonly Map map = new();
+        public static int level = 1;
+        public static readonly TileMap map = new();
         public static readonly Player player = new();
 
         public static Vector2 cameraPos;
@@ -19,7 +19,7 @@ namespace TopDownShooter
         private static float enemySpawnTimer = 0f;
         private const int globalEnemySpawnLimit = 5;
 
-        public static bool DebugMode = true;
+        public static bool DebugMode = false;
 
         private static List<Projectile> projectiles = new List<Projectile>();
         private static List<Enemy> enemies = new List<Enemy>();
@@ -54,7 +54,7 @@ namespace TopDownShooter
         }
         public static void Draw()
         {
-            map.Draw(cameraPos);
+            map.Draw();
             player.Draw();
             DrawEnemies();
             DrawProjectiles();

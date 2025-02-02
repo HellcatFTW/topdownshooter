@@ -2,10 +2,6 @@
 
 namespace TopDownShooter.Entity
 {
-    internal sealed class Enemies
-    {
-    }
-
     public class EnemyTank : Enemy
     {
         private readonly Texture2D TankHullTexture;

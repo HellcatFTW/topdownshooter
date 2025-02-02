@@ -26,7 +26,7 @@ namespace TopDownShooter.Entity
             TankHullTexture = Globals.Content.Load<Texture2D>("TankHull");
             TankTurretTexture = Globals.Content.Load<Texture2D>("TankTurret");
 
-            position = Vector2.Zero;
+            position = Vector2.Zero + new Vector2(World.map.Width,World.map.Height) / 2;
             rotation = MathHelper.PiOver2;
             hitBox = new HitBox(position, TankHullTexture.Bounds, 0);
         }
