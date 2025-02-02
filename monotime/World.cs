@@ -116,7 +116,7 @@ namespace TopDownShooter
                     continue;
                 }
 
-                Vector2? mtv = HitBox.MinimumTranslationVector(player.Hitbox.Value, enemy.Hitbox.Value, out _);
+                Vector2? mtv = HitBox.MinimumTranslationVector(player.Hitbox.Value, enemy.Hitbox.Value, out _, out _);
 
                 if (mtv == null)
                 {
@@ -144,7 +144,7 @@ namespace TopDownShooter
                     {
                         continue;
                     }
-                    Vector2? mtv = HitBox.MinimumTranslationVector(enemy.Hitbox.Value, otherEnemy.Hitbox.Value, out _);
+                    Vector2? mtv = HitBox.MinimumTranslationVector(enemy.Hitbox.Value, otherEnemy.Hitbox.Value, out _, out _);
                     if (mtv == null)
                     {
                         continue;

@@ -82,10 +82,11 @@ namespace TopDownShooter
         /// <param name="ConvexShape1Vertices"></param>
         /// <param name="ConvexShape2Vertices"></param>
         /// <returns></returns>
-        public static Vector2? SeparatingAxisTheorem(Vector2[] ConvexShape1Vertices, Vector2[] ConvexShape2Vertices, out Vector2? MTVStartingPoint)
+        public static Vector2? SeparatingAxisTheorem(Vector2[] ConvexShape1Vertices, Vector2[] ConvexShape2Vertices, out Vector2? MTVStartingPoint, out bool FlipMTVWhenDrawing)
         {
             AxisBoolPair[] axesToTest = new AxisBoolPair[ConvexShape1Vertices.Length + ConvexShape2Vertices.Length];
             MTVStartingPoint = null;
+            FlipMTVWhenDrawing = false;
 
             Vector2[] normals1 = GetNormals(ConvexShape1Vertices);
             Vector2[] normals2 = GetNormals(ConvexShape2Vertices);
@@ -100,7 +101,7 @@ namespace TopDownShooter
                 axesToTest[i].Axis = normals2[i - ConvexShape1Vertices.Length];
                 axesToTest[i].isFromFirstShape = false;
             }
-            
+
             float minimumProjectionDifference = float.PositiveInfinity;
             Vector2 minimumTranslationAxis = Vector2.Zero;
 
@@ -120,7 +121,7 @@ namespace TopDownShooter
                 foreach (Vector2 vertex in ConvexShape2Vertices) // get the lowest and highest result of projecting vertices of shape 2 onto the axis we are testing
                 {
                     float projectionLength = ProjectionLength(vertex, axis);
-                    secondShapeValues.UpdateValues(projectionLength,vertex);
+                    secondShapeValues.UpdateValues(projectionLength, vertex);
                 }
 
                 if (firstShapeValues.minimum < secondShapeValues.minimum) // if first shape projection starts lower than second shape projection
@@ -138,10 +139,12 @@ namespace TopDownShooter
                         if (isCurrentAxisFromFirstShape)
                         {
                             MTVStartingPoint = secondShapeValues.vertexForMinimum;
+                            FlipMTVWhenDrawing = false;
                         }
                         else
                         {
                             MTVStartingPoint = firstShapeValues.vertexForMaximum;
+                            FlipMTVWhenDrawing = true;
                         }
                     }
                 }
@@ -160,10 +163,12 @@ namespace TopDownShooter
                         if (isCurrentAxisFromFirstShape)
                         {
                             MTVStartingPoint = secondShapeValues.vertexForMaximum;
+                            FlipMTVWhenDrawing = false;
                         }
                         else
                         {
                             MTVStartingPoint = firstShapeValues.vertexForMinimum;
+                            FlipMTVWhenDrawing = true;
                         }
                     }
                 }
@@ -207,7 +212,7 @@ namespace TopDownShooter
             public bool isFromFirstShape;
 
             public AxisBoolPair()
-            { 
+            {
                 Axis = new Vector2();
                 isFromFirstShape = false;
             }
@@ -271,7 +276,7 @@ namespace TopDownShooter
 
             Texture2D pixelTexture = GenerateTexture(1, 1, color);
 
-            Vector2 startingDrawPos =  startingPoint - World.cameraPos;
+            Vector2 startingDrawPos = startingPoint - World.cameraPos;
             int startX = ((int)startingDrawPos.X);
             int startY = ((int)startingDrawPos.Y);
 
@@ -291,11 +296,15 @@ namespace TopDownShooter
             Texture2D pixelTexture = GenerateTexture(1, 1, color);
             Globals.SpriteBatch.Draw(pixelTexture, position, color);
         }
+        public static void DrawText(string text, Vector2 position, Color color = default(Color))
+        {
+            Globals.SpriteBatch.DrawString(Globals.Content.Load<SpriteFont>("Arial"), text, position, color);
+        }
         public static Texture2D GenerateTexture(int width, int height, Color color)
         {
             Texture2D texture = new Texture2D(Globals.graphics.GraphicsDevice, width, height);
 
-            Color[] data = new Color[width*height];
+            Color[] data = new Color[width * height];
             for (int pixel = 0; pixel < data.Length; pixel++)
             {
                 data[pixel] = color;

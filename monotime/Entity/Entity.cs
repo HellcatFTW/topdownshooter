@@ -113,11 +113,11 @@ namespace TopDownShooter.Entity
         }
         public static bool Intersect(HitBox hitbox1, HitBox hitbox2)
         {
-            return SeparatingAxisTheorem(hitbox1.Vertices, hitbox2.Vertices, out _) != null;
+            return SeparatingAxisTheorem(hitbox1.Vertices, hitbox2.Vertices, out _, out _) != null;
         }
-        public static Vector2? MinimumTranslationVector(HitBox hitbox1, HitBox hitbox2, out Vector2? MTVStartingPoint)
+        public static Vector2? MinimumTranslationVector(HitBox hitbox1, HitBox hitbox2, out Vector2? MTVStartingPoint, out bool FlipMTVWhenDrawing)
         {
-            return SeparatingAxisTheorem(hitbox1.Vertices, hitbox2.Vertices, out MTVStartingPoint);
+            return SeparatingAxisTheorem(hitbox1.Vertices, hitbox2.Vertices, out MTVStartingPoint, out FlipMTVWhenDrawing);
         }
     }
     public interface IHealth
