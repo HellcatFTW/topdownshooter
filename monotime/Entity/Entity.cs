@@ -53,6 +53,8 @@ namespace TopDownShooter.Entity
     public struct HitBox
     {
         public Vector2[] Vertices { get => vertices; }
+        public float DiagonalLength { get => (vertices[2] - vertices[0]).Length(); }
+
         private Vector2[] vertices = new Vector2[4];
 
         public float Rotation { get => (vertices[1] - vertices[0]).ToRotation(); }
@@ -113,11 +115,30 @@ namespace TopDownShooter.Entity
         }
         public static bool Intersect(HitBox hitbox1, HitBox hitbox2)
         {
-            return SeparatingAxisTheorem(hitbox1.Vertices, hitbox2.Vertices, out _, out _) != null;
+            if (IntersectCircle(hitbox1, hitbox2))
+            {
+                return SeparatingAxisTheorem(hitbox1.Vertices, hitbox2.Vertices, out _, out _) != null;
+            }
+            return false;
+        }
+        public static bool IntersectCircle(HitBox hitbox1, HitBox hitbox2)
+        {
+            float distance = (hitbox1.Origin - hitbox2.Origin).Length();
+            if (distance <= (hitbox1.DiagonalLength / 2) + (hitbox2.DiagonalLength / 2))
+            {
+                return true;
+            }
+            return false;
         }
         public static Vector2? MinimumTranslationVector(HitBox hitbox1, HitBox hitbox2, out Vector2? MTVStartingPoint, out bool FlipMTVWhenDrawing)
         {
-            return SeparatingAxisTheorem(hitbox1.Vertices, hitbox2.Vertices, out MTVStartingPoint, out FlipMTVWhenDrawing);
+            if (IntersectCircle(hitbox1, hitbox2))
+            {
+                return SeparatingAxisTheorem(hitbox1.Vertices, hitbox2.Vertices, out MTVStartingPoint, out FlipMTVWhenDrawing);
+            }
+            MTVStartingPoint = null;
+            FlipMTVWhenDrawing = false;
+            return null;
         }
     }
     public interface IHealth

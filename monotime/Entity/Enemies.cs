@@ -97,7 +97,7 @@ namespace TopDownShooter.Entity
                     break;
 
                 case ((int)MovementModes.ShowingSideToPlayer):
-                    // set movement 90 degrees off directionToPlayer for one frame, dont update
+                    // set movement 90 degrees off directionToPlayer for one frame, don't update
                     if (!movementIsSet)
                     {
                         velocity = Vector2.Zero;
@@ -108,7 +108,7 @@ namespace TopDownShooter.Entity
                     break;
 
                 case ((int)MovementModes.TowardPlayer):
-                    // offset some +-45 degrees from direction to player, dont update
+                    // offset some +-45 degrees from direction to player, don't update
                     if (!movementIsSet)
                     {
                         velocity = Vector2.Zero;

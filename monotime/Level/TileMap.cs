@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TopDownShooter.Entity;
 
 namespace TopDownShooter.Level
 {
@@ -12,6 +13,8 @@ namespace TopDownShooter.Level
         private static TileTypes[,] tileIndex;
         public int Width { get => tileIndex.GetUpperBound(0) * groundTexture.Width; }
         public int Height { get => tileIndex.GetUpperBound(1) * groundTexture.Height; }
+
+        public List<HitBox> tileHitBoxes = new();
 
         private Texture2D groundTexture;
         private Texture2D wallTexture;
@@ -49,8 +52,27 @@ namespace TopDownShooter.Level
                     }
                 }
             }
-        }
 
+            SetHitboxes();
+        }
+        private void SetHitboxes()
+        {
+            int tileWidth = groundTexture.Width;
+            int tileHeight = groundTexture.Height;
+
+            for (int x = 0; x <= tileIndex.GetUpperBound(0); x++)
+            {
+                for (int y = 0; y <= tileIndex.GetUpperBound(1); y++)
+                {
+                    Vector2 tilePosition = new Vector2(y * tileHeight, x * tileWidth); // these are backwards because the map is flipped weird.
+
+                    if (tileIndex[x, y] == TileTypes.Wall)
+                    {
+                        tileHitBoxes.Add(new HitBox(tilePosition + new Vector2(tileWidth / 2, tileHeight / 2), wallTexture.Bounds, 0f));
+                    }
+                }
+            }
+        }
         public void Draw()
         {
             int tileWidth = groundTexture.Width;
@@ -76,6 +98,13 @@ namespace TopDownShooter.Level
                             break;
 
                     }
+                }
+            }
+            if (World.DebugMode && tileHitBoxes.Count > 0)
+            {
+                foreach (HitBox hitBox in tileHitBoxes)
+                {
+                    Utils.DrawHitbox(hitBox, Color.Green);
                 }
             }
         }

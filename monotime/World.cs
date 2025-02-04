@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TopDownShooter.Entity;
 using TopDownShooter.Level;
 
@@ -65,6 +66,11 @@ namespace TopDownShooter
         {
             ProcessPlayerShootingEnemy();
             ProcessEnemyShootingPlayer();
+
+            ProcessEnemyToWallCollisions();
+            ProcessPlayerToWallCollisions();
+            ProcessProjectileToWallCollisions();
+
             ProcessPlayerToEnemyCollisions();
             ProcessEnemyToEnemyCollisions();
         }
@@ -131,7 +137,7 @@ namespace TopDownShooter
             foreach (Enemy enemy in enemies)
             {
                 if (enemy.Hitbox == null)
-                { 
+                {
                     continue;
                 }
                 foreach (Enemy otherEnemy in enemies)
@@ -151,6 +157,58 @@ namespace TopDownShooter
                     }
 
                     otherEnemy.MoveBy(mtv.Value);
+                }
+            }
+        }
+        public static void ProcessPlayerToWallCollisions()
+        {
+            if (player.Hitbox == null)
+            {
+                return;
+            }
+            foreach (HitBox tileHitbox in map.tileHitBoxes)
+            {
+                Vector2? mtv = HitBox.MinimumTranslationVector(tileHitbox, player.Hitbox.Value, out _, out _);
+                if (mtv == null)
+                {
+                    continue;
+                }
+                player.MoveBy(mtv.Value);
+            }
+        }
+        public static void ProcessProjectileToWallCollisions()
+        {
+            foreach (HitBox tileHitbox in map.tileHitBoxes)
+            {
+                foreach (Projectile projectile in projectiles)
+                {
+                    if (projectile.Hitbox == null)
+                    {
+                        continue;
+                    }
+                    if (HitBox.Intersect(tileHitbox,projectile.Hitbox.Value))
+                    {
+                        projectile.Kill();
+                    }
+                }
+            }
+        }
+        public static void ProcessEnemyToWallCollisions()
+        {
+            foreach (HitBox tileHitbox in map.tileHitBoxes)
+            {
+                foreach(Enemy enemy in enemies)
+                {
+                    if (enemy.Hitbox == null)
+                    {
+                        continue;
+                    }
+                    Vector2? mtv = HitBox.MinimumTranslationVector(tileHitbox, enemy.Hitbox.Value, out _, out _);
+                    if (mtv == null)
+                    {
+                        continue;
+                    }
+                    enemy.MoveBy(mtv.Value);
                 }
             }
         }
