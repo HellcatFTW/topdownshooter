@@ -14,7 +14,7 @@ namespace TopDownShooter.Level
         public int Width { get => tileIndex.GetUpperBound(0) * groundTexture.Width; }
         public int Height { get => tileIndex.GetUpperBound(1) * groundTexture.Height; }
 
-        public List<HitBox> tileHitBoxes = new();
+        public HitBox?[,] hitboxIndex;
 
         private Texture2D groundTexture;
         private Texture2D wallTexture;
@@ -30,7 +30,8 @@ namespace TopDownShooter.Level
 
             mapTexture.GetData(colorArray);
 
-            tileIndex = new TileTypes[mapTexture.Width, mapTexture.Height];
+            tileIndex = new TileTypes[mapTexture.Height, mapTexture.Width]; // swapped X Y here and in assignments below because map is seemingly flipped
+            hitboxIndex = new HitBox?[mapTexture.Height, mapTexture.Width]; // swapped X Y here and in assignments below because map is seemingly flipped
 
             for (int x = 0; x < mapTexture.Width; x++)
             {
@@ -40,15 +41,15 @@ namespace TopDownShooter.Level
 
                     if (currentColor.R <= 50 && currentColor.G >= 200 && currentColor.B <= 50)
                     {
-                        tileIndex[x, y] = TileTypes.Ground;
+                        tileIndex[y, x] = TileTypes.Ground;
                     }
                     else if (currentColor.R >= 200 && currentColor.G <= 50 && currentColor.B <= 50)
                     {
-                        tileIndex[x, y] = TileTypes.Wall;
+                        tileIndex[y, x] = TileTypes.Wall;
                     }
                     else if (currentColor.R >= 200 && currentColor.G >= 200 && currentColor.B >= 200)
                     {
-                        tileIndex[x, y] = TileTypes.Air;
+                        tileIndex[y, x] = TileTypes.Air;
                     }
                 }
             }
@@ -64,11 +65,15 @@ namespace TopDownShooter.Level
             {
                 for (int y = 0; y <= tileIndex.GetUpperBound(1); y++)
                 {
-                    Vector2 tilePosition = new Vector2(y * tileHeight, x * tileWidth); // these are backwards because the map is flipped weird.
+                    Vector2 tilePosition = new Vector2(x * tileHeight, y * tileWidth);
 
                     if (tileIndex[x, y] == TileTypes.Wall)
                     {
-                        tileHitBoxes.Add(new HitBox(tilePosition + new Vector2(tileWidth / 2, tileHeight / 2), wallTexture.Bounds, 0f));
+                        hitboxIndex[x, y] = new HitBox(tilePosition + new Vector2(tileWidth / 2, tileHeight / 2), wallTexture.Bounds, 0f);
+                    }
+                    else
+                    {
+                        hitboxIndex[x, y] = null;
                     }
                 }
             }
@@ -82,7 +87,7 @@ namespace TopDownShooter.Level
             {
                 for (int y = 0; y <= tileIndex.GetUpperBound(1); y++)
                 {
-                    Vector2 tilePosition = new Vector2(y * tileHeight, x * tileWidth) - World.cameraPos; // these are backwards because the map is flipped weird.
+                    Vector2 tilePosition = new Vector2(x * tileHeight, y * tileWidth) - World.cameraPos;
 
                     switch (tileIndex[x, y])
                     {
@@ -100,13 +105,61 @@ namespace TopDownShooter.Level
                     }
                 }
             }
-            if (World.DebugMode && tileHitBoxes.Count > 0)
+            if (World.DebugMode && hitboxIndex.Length > 0)
             {
-                foreach (HitBox hitBox in tileHitBoxes)
+                foreach (HitBox hitBox in hitboxIndex)
                 {
                     Utils.DrawHitbox(hitBox, Color.Green);
                 }
             }
+        }
+        /// <summary>
+        /// Returns the hitboxes surrounding (and including) entity position
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
+        public List<HitBox> GetNearestHitboxes(Vector2 position)
+        { 
+            Point entityIndex = WorldToTileCoordinates(position);
+            int entityX = entityIndex.X;
+            int entityY = entityIndex.Y;
+
+            List<HitBox> nearHitboxes = new List<HitBox>();
+
+            for (int x = entityX - 1; x <= entityX + 1; x++)
+            {
+                if (x < hitboxIndex.GetLowerBound(0) || x > hitboxIndex.GetUpperBound(0))
+                { 
+                    continue;
+                }
+                for (int y = entityY - 1; y <= entityY + 1; y++)
+                {
+                    if (y < hitboxIndex.GetLowerBound(1) || y > hitboxIndex.GetUpperBound(1))
+                    {
+                        continue;
+                    }
+                    if (hitboxIndex[x, y] != null)
+                    {
+                        nearHitboxes.Add(hitboxIndex[x, y].Value);
+                    }
+                }
+            }
+
+            return nearHitboxes;
+        }
+        public Point WorldToTileCoordinates(Vector2 WorldPosition)
+        {
+            int tileWidth = groundTexture.Width;
+            int tileHeight = groundTexture.Height;
+
+            return new Point(((int)(WorldPosition.X / tileWidth)), ((int)(WorldPosition.Y / tileHeight)));
+        }
+        public Vector2 TileToWorldCoordinates(Vector2 TilePosition)
+        {
+            int tileWidth = groundTexture.Width;
+            int tileHeight = groundTexture.Height;
+
+            return new Vector2(TilePosition.X * tileWidth, TilePosition.Y * tileHeight);
         }
         private enum TileTypes : int
         {

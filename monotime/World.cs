@@ -166,7 +166,7 @@ namespace TopDownShooter
             {
                 return;
             }
-            foreach (HitBox tileHitbox in map.tileHitBoxes)
+            foreach (HitBox tileHitbox in map.GetNearestHitboxes(player.Position))
             {
                 Vector2? mtv = HitBox.MinimumTranslationVector(tileHitbox, player.Hitbox.Value, out _, out _);
                 if (mtv == null)
@@ -178,26 +178,27 @@ namespace TopDownShooter
         }
         public static void ProcessProjectileToWallCollisions()
         {
-            foreach (HitBox tileHitbox in map.tileHitBoxes)
+            foreach (Projectile projectile in projectiles)
             {
-                foreach (Projectile projectile in projectiles)
+                foreach (HitBox tileHitbox in map.GetNearestHitboxes(projectile.Position))
                 {
                     if (projectile.Hitbox == null)
                     {
                         continue;
                     }
-                    if (HitBox.Intersect(tileHitbox,projectile.Hitbox.Value))
+                    if (HitBox.Intersect(tileHitbox, projectile.Hitbox.Value))
                     {
                         projectile.Kill();
                     }
                 }
             }
         }
+        
         public static void ProcessEnemyToWallCollisions()
         {
-            foreach (HitBox tileHitbox in map.tileHitBoxes)
+            foreach (Enemy enemy in enemies)
             {
-                foreach(Enemy enemy in enemies)
+                foreach (HitBox tileHitbox in map.GetNearestHitboxes(enemy.Position))
                 {
                     if (enemy.Hitbox == null)
                     {
