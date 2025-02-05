@@ -41,8 +41,6 @@ namespace TopDownShooter.Entity
 
             hitBox.Value.SetHitboxRotation(rotation);
 
-            World.cameraPos = position - new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2);
-
             if (shootTimer > 0f)
             {
                 shootTimer -= (float)Globals.gameTime.ElapsedGameTime.TotalSeconds;
@@ -66,6 +64,11 @@ namespace TopDownShooter.Entity
             {
                 Utils.DrawHitbox(hitBox.Value);
             }
+        }
+        public override void MoveBy(Vector2 vector)
+        {
+            base.MoveBy(vector);
+            World.cameraPos = position - new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2);
         }
         public void MoveAndTurn()
         {
