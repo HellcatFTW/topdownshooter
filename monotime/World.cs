@@ -67,12 +67,12 @@ namespace TopDownShooter
             ProcessPlayerShootingEnemy();
             ProcessEnemyShootingPlayer();
 
-            ProcessEnemyToWallCollisions();
-            ProcessPlayerToWallCollisions();
-            ProcessProjectileToWallCollisions();
-
             ProcessPlayerToEnemyCollisions();
             ProcessEnemyToEnemyCollisions();
+
+            ProcessPlayerToWallCollisions();
+            ProcessEnemyToWallCollisions();
+            ProcessProjectileToWallCollisions();
         }
 
         public static void ProcessPlayerShootingEnemy()
@@ -140,23 +140,23 @@ namespace TopDownShooter
                 {
                     continue;
                 }
-                foreach (Enemy otherEnemy in enemies)
+                foreach (Enemy pushedEnemy in enemies)
                 {
-                    if (enemy == otherEnemy)
+                    if (enemy == pushedEnemy)
                     {
                         continue;
                     }
-                    if (otherEnemy.Hitbox == null)
+                    if (pushedEnemy.Hitbox == null)
                     {
                         continue;
                     }
-                    Vector2? mtv = HitBox.MinimumTranslationVector(enemy.Hitbox.Value, otherEnemy.Hitbox.Value, out _, out _);
+                    Vector2? mtv = HitBox.MinimumTranslationVector(enemy.Hitbox.Value, pushedEnemy.Hitbox.Value, out _, out _);
                     if (mtv == null)
                     {
                         continue;
                     }
 
-                    otherEnemy.MoveBy(mtv.Value);
+                    pushedEnemy.MoveBy(mtv.Value);
                 }
             }
         }
@@ -193,7 +193,7 @@ namespace TopDownShooter
                 }
             }
         }
-        
+
         public static void ProcessEnemyToWallCollisions()
         {
             foreach (Enemy enemy in enemies)
