@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Security.Cryptography;
 using TopDownShooter.Entity;
 
 namespace TopDownShooter
@@ -65,6 +66,28 @@ namespace TopDownShooter
         public static void SetMagnitude(this ref Vector2 vector, float value)
         {
             vector = vector.WithMagnitude(value);
+        }
+
+        public static bool IsZero(this Vector2 vector)
+        {
+            if (Math.Abs(vector.X) < 0.001 && Math.Abs(vector.Y) < 0.001)
+            {
+                return true;
+            }
+            return false;
+        }
+        /// <summary>
+        /// Note: A is the normal. B is the MTV.
+        /// </summary>
+        /// <param name="A"></param>
+        /// <param name="B"></param>
+        /// <returns></returns>
+        public static Vector2 Reject(this Vector2 A , Vector2 B)
+        {
+            float projLength = ProjectionLength(B, A); // Project B onto A
+            Vector2 parallelComponent = A.WithMagnitude(projLength); //  Get vector parallel to A
+
+            return B - parallelComponent; // subtract parallel component of B from it
         }
         #endregion
         #region Color
@@ -172,6 +195,11 @@ namespace TopDownShooter
                         }
                     }
                 }
+            }
+
+            if (IsZero(minimumProjectionDifference * minimumTranslationAxis))
+            {
+                return null; // prevents weird case of mtv being 0,0
             }
 
             return minimumProjectionDifference * minimumTranslationAxis; // Return minimum translation vector. move object by this amount and it's not intersecting anymore.

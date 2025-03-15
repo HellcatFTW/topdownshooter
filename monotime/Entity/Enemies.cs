@@ -39,7 +39,7 @@ namespace TopDownShooter.Entity
                 isActive = false;
                 return;
             }
-
+            ClearNoPushList();
             AI();
 
             if (shootTimer > 0f)
@@ -104,7 +104,7 @@ namespace TopDownShooter.Entity
                         velocity += DirectionToPlayer.WithRotation(MathHelper.PiOver2).SafeNormalize(Vector2.Zero) * MovementSpeed;
                         movementIsSet = true;
                     }
-
+                
                     break;
 
                 case ((int)MovementModes.TowardPlayer):
@@ -115,7 +115,7 @@ namespace TopDownShooter.Entity
                         velocity += DirectionToPlayer.WithRotation(Globals.Random.Next(0, 2) == 0 ? MathHelper.PiOver4 : -MathHelper.PiOver4).SafeNormalize(Vector2.Zero) * MovementSpeed;
                         movementIsSet = true;
                     }
-
+                
                     break;
 
                 default:

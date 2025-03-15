@@ -45,6 +45,7 @@ namespace TopDownShooter
             }
 
 
+
             UpdateProjectiles();
             UpdateEnemies();
 
@@ -67,12 +68,16 @@ namespace TopDownShooter
             ProcessPlayerShootingEnemy();
             ProcessEnemyShootingPlayer();
 
-            ProcessPlayerToEnemyCollisions();
-            ProcessEnemyToEnemyCollisions();
+            for (int i = 0; i < 8; i++)
+            {
+                ProcessProjectileToWallCollisions();
+                ProcessPlayerToWallCollisions();
+                ProcessEnemyToWallCollisions();
 
-            ProcessPlayerToWallCollisions();
-            ProcessEnemyToWallCollisions();
-            ProcessProjectileToWallCollisions();
+
+                ProcessEnemyToEnemyCollisions(i);
+                ProcessPlayerToEnemyCollisions();
+            }
         }
 
         public static void ProcessPlayerShootingEnemy()
@@ -129,34 +134,117 @@ namespace TopDownShooter
                     continue;
                 }
 
-                enemy.MoveBy(mtv.Value);
+                if (enemy.noPushList.Count > 0)
+                {
+                    Vector2? newmtv = null;
+                    Vector2 adjustedMTV = Vector2.Zero;
+
+                    foreach (Vector2 noPushVec in enemy.noPushList)
+                    {
+                        Vector2 reject = Utils.Reject(noPushVec, mtv.Value);
+                        newmtv = HitBox.MinimumTranslationVector(enemy.Hitbox.Value, player.Hitbox.Value, out _, out _);
+                        adjustedMTV += reject;
+                    }
+                    if (!Utils.IsZero(adjustedMTV))
+                    {
+                        enemy.MoveBy(adjustedMTV);
+                        if (newmtv != null)
+                        {
+                            player.MoveBy(newmtv.Value);
+                        }
+                    }
+                    else
+                    {
+                        player.MoveBy(-mtv.Value);
+                    }
+                }
+                else
+                {
+                    enemy.MoveBy(mtv.Value);
+                }
             }
         }
-        public static void ProcessEnemyToEnemyCollisions()
+        public static void ProcessEnemyToEnemyCollisions(int currentStep)
         {
-            foreach (Enemy enemy in enemies)
+            int startpoint = 0;
+            int endpoint = enemies.Count;
+            int step = 1;
+
+            int startpoint2 = enemies.Count - 1;
+            int endpoint2 = -1;
+            int step2 = -1;
+
+            if (currentStep % 2 == 0)
             {
-                if (enemy.Hitbox == null)
+                startpoint = enemies.Count - 1;
+                endpoint = -1;
+                step = -1;
+
+                startpoint2 = 0;
+                endpoint2 = enemies.Count;
+                step2 = 1;
+            }
+
+            for (int i = startpoint; i != endpoint; i+=step)
+            {
+                for (int j = startpoint2; j != endpoint2; j+=step2)
                 {
-                    continue;
-                }
-                foreach (Enemy pushedEnemy in enemies)
-                {
-                    if (enemy == pushedEnemy)
+                    if (i == j)
                     {
                         continue;
                     }
-                    if (pushedEnemy.Hitbox == null)
+                    var enemy = enemies[i];
+                    var other = enemies[j];
+
+                    if (enemy.Hitbox == null)
                     {
                         continue;
                     }
-                    Vector2? mtv = HitBox.MinimumTranslationVector(enemy.Hitbox.Value, pushedEnemy.Hitbox.Value, out _, out _);
+                    if (other.Hitbox == null)
+                    {
+                        continue;
+                    }
+                    Vector2? mtv = HitBox.MinimumTranslationVector(enemy.Hitbox.Value, other.Hitbox.Value, out _, out _);
+
                     if (mtv == null)
                     {
                         continue;
                     }
 
-                    pushedEnemy.MoveBy(mtv.Value);
+
+                    if (other.noPushList.Count > 0)
+                    {
+                        Vector2? newmtv = null;
+                        Vector2 adjustedMTV = Vector2.Zero;
+
+                        foreach (Vector2 noPushVec in other.noPushList)
+                        {
+                            Vector2 reject = Utils.Reject(noPushVec, mtv.Value);
+                            newmtv = HitBox.MinimumTranslationVector(other.Hitbox.Value, enemy.Hitbox.Value, out _, out _);
+                            adjustedMTV += reject;
+                            if (Utils.IsZero(reject))
+                            {
+                                enemy.noPushList.Add(noPushVec);
+                            }
+                        }
+                        if (!Utils.IsZero(adjustedMTV))
+                        {
+                            other.MoveBy(adjustedMTV);
+                            if (newmtv != null)
+                            {
+                                enemy.MoveBy(newmtv.Value);
+                            }
+                        }
+                        else
+                        {
+                            enemy.MoveBy(-mtv.Value);
+                        }
+                    }
+                    else
+                    {
+                        enemy.MoveBy(-mtv.Value / 2);
+                        other.MoveBy(mtv.Value / 2);
+                    }
                 }
             }
         }
@@ -210,6 +298,7 @@ namespace TopDownShooter
                         continue;
                     }
                     enemy.MoveBy(mtv.Value);
+                    enemy.noPushList.Add(mtv.Value);
                 }
             }
         }

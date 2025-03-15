@@ -37,6 +37,8 @@ namespace TopDownShooter.Entity
                 isActive = false;
             }
 
+            ClearNoPushList();
+
             MoveAndTurn();
 
             hitBox.Value.SetHitboxRotation(rotation);

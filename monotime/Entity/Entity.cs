@@ -16,6 +16,7 @@ namespace TopDownShooter.Entity
         protected Vector2 velocity;
         public HitBox? Hitbox { get => hitBox; }
         protected HitBox? hitBox;
+        public List<Vector2> noPushList = new();
         public bool IsActive { get => isActive; }
         protected bool isActive = true;
         public abstract void Update();
@@ -30,6 +31,10 @@ namespace TopDownShooter.Entity
                 return;
             }
             hitBox.Value.MoveVerticesBy(vector);
+        }
+        public virtual void ClearNoPushList()
+        {
+            noPushList = new List<Vector2>();
         }
         public virtual void SetPosition(Vector2 newPosition)
         {
