@@ -154,12 +154,47 @@ namespace TopDownShooter.Level
 
             return new Point(((int)(WorldPosition.X / tileWidth)), ((int)(WorldPosition.Y / tileHeight)));
         }
-        public Vector2 TileToWorldCoordinates(Vector2 TilePosition)
+        public Vector2 TileToWorldCoordinates(Point TilePosition)
         {
             int tileWidth = groundTexture.Width;
             int tileHeight = groundTexture.Height;
 
             return new Vector2(TilePosition.X * tileWidth, TilePosition.Y * tileHeight);
+        }
+        private bool ValidatePosition(Point position)
+        {
+            var xCoord = (int)MathHelper.Clamp(position.X, tileIndex.GetLowerBound(0), tileIndex.GetUpperBound(0));
+            var yCoord = (int)MathHelper.Clamp(position.Y, tileIndex.GetLowerBound(1), tileIndex.GetUpperBound(1));
+            TileTypes tile = tileIndex[xCoord, yCoord];
+            return tile != TileTypes.Wall && tile != TileTypes.Air;
+        }
+        public Vector2 GenerateSpawn()
+        {
+            const int minimumSpawnDistanceX = 10;
+            const int minimumSpawnDistanceY = 6;
+            Point spawnPos;
+
+            Point playerPos = WorldToTileCoordinates(World.player.Position);
+            Point offset;
+
+            do
+            {
+                offset = new Point((Globals.Random.Next(minimumSpawnDistanceX, minimumSpawnDistanceX + Globals.Random.Next(0, 3))), (Globals.Random.Next(minimumSpawnDistanceY, minimumSpawnDistanceY + Globals.Random.Next(0,2))));
+                if (Globals.Random.NextSingle() < 0.5)
+                {
+                    spawnPos = playerPos + offset;
+                }
+                else
+                {
+                    spawnPos = playerPos - offset;
+                }
+            }
+            while (!ValidatePosition(spawnPos));
+
+            var xCoord = (int)MathHelper.Clamp(spawnPos.X, tileIndex.GetLowerBound(0), tileIndex.GetUpperBound(0));
+            var yCoord = (int)MathHelper.Clamp(spawnPos.Y, tileIndex.GetLowerBound(1), tileIndex.GetUpperBound(1));
+
+            return TileToWorldCoordinates(new Point(xCoord,yCoord));
         }
         private enum TileTypes : int
         {

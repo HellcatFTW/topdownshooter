@@ -32,19 +32,7 @@ namespace TopDownShooter
 
             player.Update();
 
-
-            ////TODO: implement spawn chances of different enemies
-            if (enemySpawnTimer > 0f)
-            {
-                enemySpawnTimer -= (float)Globals.gameTime.ElapsedGameTime.TotalSeconds;
-            }
-            if (enemySpawnTimer <= 0f && enemies.Count < globalEnemySpawnLimit)
-            {
-                Enemy.NewEnemy<EnemyTank>();
-                enemySpawnTimer = enemySpawnCooldown;
-            }
-
-
+            SpawnEnemies();
 
             UpdateProjectiles();
             UpdateEnemies();
@@ -62,6 +50,18 @@ namespace TopDownShooter
             DrawProjectiles();
         }
 
+        private static void SpawnEnemies()
+        {
+            if (enemySpawnTimer > 0f)
+            {
+                enemySpawnTimer -= (float)Globals.gameTime.ElapsedGameTime.TotalSeconds;
+            }
+            if (enemySpawnTimer <= 0f && enemies.Count < globalEnemySpawnLimit)
+            {
+                Enemy.NewEnemy<EnemyTank>();
+                enemySpawnTimer = enemySpawnCooldown;
+            }
+        }
         #region Collisions
         public static void ProcessCollisions()
         {
@@ -166,28 +166,28 @@ namespace TopDownShooter
         }
         public static void ProcessEnemyToEnemyCollisions(int currentStep)
         {
-            int startpoint = 0;
-            int endpoint = enemies.Count;
+            int start = 0;
+            int end = enemies.Count;
             int step = 1;
 
-            int startpoint2 = enemies.Count - 1;
-            int endpoint2 = -1;
+            int innerStart = enemies.Count - 1;
+            int innerEnd = -1;
             int step2 = -1;
 
             if (currentStep % 2 == 0)
             {
-                startpoint = enemies.Count - 1;
-                endpoint = -1;
+                start = enemies.Count - 1;
+                end = -1;
                 step = -1;
 
-                startpoint2 = 0;
-                endpoint2 = enemies.Count;
+                innerStart = 0;
+                innerEnd = enemies.Count;
                 step2 = 1;
             }
 
-            for (int i = startpoint; i != endpoint; i+=step)
+            for (int i = start; i != end; i+=step)
             {
-                for (int j = startpoint2; j != endpoint2; j+=step2)
+                for (int j = innerStart; j != innerEnd; j+=step2)
                 {
                     if (i == j)
                     {
