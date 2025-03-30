@@ -20,6 +20,9 @@ namespace TopDownShooter
         protected override void Initialize()
         {
             Globals.Content = Content;
+            Globals.ScreenHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            Globals.ScreenWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            UI.Initialize();
             base.Initialize();
         }
 
@@ -37,6 +40,7 @@ namespace TopDownShooter
 
             Input.Update();
             World.Update();
+            UI.Update();
             base.Update(gameTime);
         }
 
@@ -46,6 +50,7 @@ namespace TopDownShooter
 
             spriteBatch.Begin();
             World.Draw();
+            UI.Draw();
             spriteBatch.End();
             base.Draw(gameTime);
         }

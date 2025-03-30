@@ -14,7 +14,9 @@ namespace TopDownShooter
         public static Vector2 cameraPos;
 
         private static Vector2 mouseWorld;
+        private static Vector2 mouseScreen;
         public static Vector2 MouseWorld { get => mouseWorld; }
+        public static Vector2 MouseScreen { get => mouseScreen; }
 
         private static float enemySpawnCooldown = 5f;
         private static float enemySpawnTimer = 0f;
@@ -29,6 +31,7 @@ namespace TopDownShooter
             MouseState mouse = Mouse.GetState();
 
             mouseWorld = mouse.Position.ToVector2() + cameraPos;
+            mouseScreen = mouse.Position.ToVector2();
 
             player.Update();
 

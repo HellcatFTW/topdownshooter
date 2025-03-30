@@ -7,6 +7,8 @@ namespace TopDownShooter.Entity
     {
         private readonly Texture2D TankHullTexture;
         private readonly Texture2D TankTurretTexture;
+        private readonly float turretOriginOffset;
+        private readonly float turretPositionOffset;
 
         private float turretRotation = 0f;
         private float hullRotation = 0f;
@@ -25,6 +27,7 @@ namespace TopDownShooter.Entity
         {
             TankHullTexture = Globals.Content.Load<Texture2D>("TankHull");
             TankTurretTexture = Globals.Content.Load<Texture2D>("TankTurret");
+            turretOriginOffset = 9f;
 
             position = Vector2.Zero + new Vector2(World.map.Width,World.map.Height) / 2;
             rotation = MathHelper.PiOver2;
@@ -56,7 +59,7 @@ namespace TopDownShooter.Entity
         }
         public override void Draw()
         {
-            Vector2 turretOrigin = new Vector2(TankTurretTexture.Width / 2, TankTurretTexture.Height / 2 + 9f); // 9 pixel offset to accommodate for the barrel and have proper rotation
+            Vector2 turretOrigin = new Vector2(TankTurretTexture.Width / 2, TankTurretTexture.Height / 2 + turretOriginOffset); // 9 pixel offset to accommodate for the barrel and have proper rotation
             Vector2 hullOrigin = new Vector2(TankHullTexture.Width / 2, TankTurretTexture.Height / 2);
 
             Globals.SpriteBatch.Draw(TankHullTexture, position - World.cameraPos, null, Color.White, hullRotation, hullOrigin, 1, SpriteEffects.None, LayerDepths.Entities);
