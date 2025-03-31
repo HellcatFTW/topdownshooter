@@ -6,40 +6,53 @@ namespace TopDownShooter
 
     public static class UI
     {
-        private static List<UILayout> layouts = new List<UILayout>();
+        private static Dictionary<LayoutIndex, UILayout> layouts;
+        private static LayoutIndex activeLayout = LayoutIndex.MainMenu;
 
         public static void Initialize()
         {
-            layouts.Add(new MainMenu());
+            layouts = new();
+
+            layouts[LayoutIndex.MainMenu] = new MainMenu();
         }
 
         public static void Draw()
         {
-            foreach (UILayout layout in layouts)
+            foreach (var kvp in layouts)
             {
-                if (!layout.IsActive)
+                if (kvp.Key == activeLayout)
                 {
-                    continue;
+                    kvp.Value.Draw();
                 }
-                layout.Draw();
             }
         }
         public static void Update()
         {
-            foreach (UILayout layout in layouts)
+            foreach (var kvp in layouts)
             {
-                if (!layout.IsActive)
+                if (kvp.Key == activeLayout)
                 {
-                    continue;
+                    kvp.Value.Update();
                 }
-                layout.Update();
             }
         }
+        public static void OpenMainMenu(object sender, EventArgs e)
+        {
+            activeLayout = LayoutIndex.MainMenu;
+        }
+        public static void OpenLevelSelect(object sender, EventArgs e)
+        {
+            activeLayout = LayoutIndex.LevelSelect;
+        }
+    }
+    public enum LayoutIndex
+    {
+        MainMenu = 0,
+        LevelSelect = 1,
     }
     public abstract class UILayout : UIComponent
     {
         protected List<Container> children = new List<Container>();
-        public bool IsActive { get; set; } = false;
         public void Draw()
         {
             foreach (Container child in children)
@@ -63,9 +76,12 @@ namespace TopDownShooter
             Vector2 exitPos = new Vector2(834, 707);
             Vector2 logoPos = new Vector2(729, 98);
 
-            Button playButton = new Button(playPos, 1f, null, Globals.Content.Load<Texture2D>("Play"));
-            Button exitButton = new Button(exitPos, 1f, null, Globals.Content.Load<Texture2D>("Exit"));
+            Button playButton = new Button(playPos, 1f, Globals.Content.Load<Texture2D>("Play"), Globals.Content.Load<Texture2D>("PlayHover"));
+            Button exitButton = new Button(exitPos, 1f, Globals.Content.Load<Texture2D>("Exit"), Globals.Content.Load<Texture2D>("ExitHover"));
             Image logo = new Image(logoPos, 1f, Globals.Content.Load<Texture2D>("Title"));
+
+            playButton.Click += UI.OpenLevelSelect;
+            exitButton.Click += Main.instance.ExitWrapper;
 
             Container container = new Container(new Vector2(0,0), 1f, playButton, exitButton, logo);
             children.Add(container);
@@ -110,15 +126,16 @@ namespace TopDownShooter
     }
     public class Button : UIElement
     {
-        private String text;
         private Texture2D imageTexture;
+        private Texture2D hoverTexture;
 
         public event EventHandler Click;
-        public Button(Vector2 position, float scale,string text, Texture2D imageTexture) : base(position, scale)
+        public Button(Vector2 position, float scale, Texture2D imageTexture, Texture2D hoverTexture) : base(position, scale)
         {
-            this.text = text;
             this.imageTexture = imageTexture;
+            this.hoverTexture = hoverTexture;
             this.bounds = imageTexture.Bounds;
+            this.bounds.Location = position.ToPoint();
         }
         private void OnClick(EventArgs e)
         {
@@ -126,14 +143,24 @@ namespace TopDownShooter
         }
         public override void Draw()
         {
-            Globals.SpriteBatch.Draw(imageTexture, position, Color.White);
+            if (IsMousedOver())
+            {
+                Globals.SpriteBatch.Draw(hoverTexture, position, Color.White);
+            }
+            else
+            {
+                Globals.SpriteBatch.Draw(imageTexture, position, Color.White);
+            }
         }
 
         public override void Update()
         {
-            if (IsMousedOver() && Input.MouseLeft)
+            if (IsMousedOver())
             {
-                OnClick(EventArgs.Empty);
+                if (Input.MouseLeft)
+                {
+                    OnClick(EventArgs.Empty);
+                }
             }
         }
     }
@@ -145,6 +172,7 @@ namespace TopDownShooter
         {
             this.imageTexture = imageTexture;
             this.bounds = imageTexture.Bounds;
+            this.bounds.Location = position.ToPoint();
         }
         public override void Update()
         {

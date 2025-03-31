@@ -4,11 +4,13 @@ namespace TopDownShooter
 {
     public sealed class Main : Game
     {
+        public static Main instance { get; private set; }
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
         public Main()
         {
+            instance = this;
             graphics = new GraphicsDeviceManager(this);
             Globals.graphics = graphics;
             Content.RootDirectory = "Content";
@@ -61,6 +63,10 @@ namespace TopDownShooter
             {
                 Exit();
             }
+        }
+        public void ExitWrapper(object sender, EventArgs e)
+        {
+            Exit();
         }
     }
     public static class LayerDepths

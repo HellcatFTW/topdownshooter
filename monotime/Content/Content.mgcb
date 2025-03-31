@@ -44,6 +44,18 @@
 /processorParam:TextureFormat=Color
 /build:Exit.png
 
+#begin ExitHover.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:ExitHover.png
+
 #begin GroundTile.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -91,6 +103,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:PlayerShell.png
+
+#begin PlayHover.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:PlayHover.png
 
 #begin T80 hull.png
 /importer:TextureImporter
