@@ -65,7 +65,7 @@ namespace TopDownShooter.Entity
             Globals.SpriteBatch.Draw(TankHullTexture, position - World.cameraPos, null, Color.White, hullRotation, hullOrigin, 1, SpriteEffects.None, LayerDepths.Entities);
 
             Globals.SpriteBatch.Draw(TankTurretTexture, position - World.cameraPos, null, Color.White, turretRotation, turretOrigin, 1, SpriteEffects.None, LayerDepths.Entities);
-            if (World.DebugMode && hitBox != null)
+            if (World.debugMode && hitBox != null)
             {
                 Utils.DrawHitbox(hitBox.Value);
             }

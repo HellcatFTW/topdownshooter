@@ -22,7 +22,9 @@ namespace TopDownShooter
         private static float enemySpawnTimer = 0f;
         private const int globalEnemySpawnLimit = 5;
 
-        public static bool DebugMode = false;
+        public static bool debugMode = false;
+        private static bool paused = false;
+        public static bool Paused { get { return paused; } }
 
         private static List<Projectile> projectiles = new List<Projectile>();
         private static List<Enemy> enemies = new List<Enemy>();
@@ -33,7 +35,7 @@ namespace TopDownShooter
             mouseWorld = mouse.Position.ToVector2() + cameraPos;
             mouseScreen = mouse.Position.ToVector2();
 
-            if (player is null || map is null)
+            if (player is null || map is null || paused)
             {
                 return;
             }
@@ -64,8 +66,24 @@ namespace TopDownShooter
         public static void ChangeLevel(int newLevel)
         {
             level = newLevel;
-            map = new();
-            player = new();
+            map = new TileMap();
+            player = new Player();
+        }
+        public static void Pause()
+        {
+            paused = true;
+        }
+        public static void Resume()
+        {
+            paused = false;
+        }
+        public static void Reset()
+        {
+            paused = false;
+            map = null;
+            player = null;
+            projectiles = new();
+            enemies = new();
         }
         private static void SpawnEnemies()
         {

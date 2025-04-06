@@ -30,7 +30,7 @@ namespace TopDownShooter.Entity
             Vector2 origin = new Vector2(texture.Width / 2, texture.Height / 2);
 
             Globals.SpriteBatch.Draw(texture, position - World.cameraPos, null, Color.White, rotation, origin, 1f, SpriteEffects.None, LayerDepths.Projectiles);
-            if (World.DebugMode && hitBox != null)
+            if (World.debugMode && hitBox != null)
             {
                 Utils.DrawHitbox(hitBox.Value);
             }

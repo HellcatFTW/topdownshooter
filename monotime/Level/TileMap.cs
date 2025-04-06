@@ -105,7 +105,7 @@ namespace TopDownShooter.Level
                     }
                 }
             }
-            if (World.DebugMode && hitboxIndex.Length > 0)
+            if (World.debugMode && hitboxIndex.Length > 0)
             {
                 foreach (HitBox hitBox in hitboxIndex)
                 {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace TopDownShooter
 {
@@ -61,7 +62,18 @@ namespace TopDownShooter
         {
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
-                Exit();
+                switch (UI.ActiveLayout)
+                {
+                    case LayoutIndex.MainMenu:
+                        Exit();
+                        break;
+                    case LayoutIndex.LevelSelect:
+                        UI.SwitchToMainMenu(null, null);
+                        break;
+                    case LayoutIndex.HUD:
+                        UI.SwitchToPauseMenu(null, null);
+                        break;
+                }
             }
         }
         public void ExitWrapper(object sender, EventArgs e)

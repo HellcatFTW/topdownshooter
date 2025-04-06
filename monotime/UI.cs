@@ -8,13 +8,16 @@ namespace TopDownShooter
     {
         private static Dictionary<LayoutIndex, UILayout> layouts;
         private static LayoutIndex activeLayout = LayoutIndex.MainMenu;
+        public static LayoutIndex ActiveLayout { get { return activeLayout; } }
 
         public static void Initialize()
         {
-            layouts = new();
-
-            layouts[LayoutIndex.MainMenu] = new MainMenu();
-            layouts[LayoutIndex.LevelSelect] = new LevelSelect();
+            layouts = new()
+            {
+                [LayoutIndex.MainMenu] = new MainMenu(),
+                [LayoutIndex.LevelSelect] = new LevelSelect(),
+                [LayoutIndex.PauseMenu] = new PauseMenu()
+            };
         }
 
         public static void Draw()
@@ -49,15 +52,30 @@ namespace TopDownShooter
         {
             activeLayout = LayoutIndex.HUD;
         }
-        public static void Level1Wrapper(object sender, EventArgs e)
+        public static void SwitchToPauseMenu(object sender, EventArgs e)
+        {
+            activeLayout = LayoutIndex.PauseMenu;
+            World.Pause();
+        }
+        public static void StartLevel1(object sender, EventArgs e)
         {
             World.ChangeLevel(1);
             SwitchToHUD(sender, e);
         }
-        public static void Level2Wrapper(object sender, EventArgs e)
+        public static void StartLevel2(object sender, EventArgs e)
         {
             World.ChangeLevel(2);
             SwitchToHUD(sender, e);
+        }
+        public static void ResumeButton(object sender, EventArgs e)
+        {
+            SwitchToHUD(sender, e);
+            World.Resume();
+        }
+        public static void BackToMenuButton(object sender, EventArgs e)
+        {
+            SwitchToMainMenu(sender, e);
+            World.Reset();
         }
     }
     public enum LayoutIndex
@@ -65,6 +83,7 @@ namespace TopDownShooter
         MainMenu = 0,
         LevelSelect = 1,
         HUD = 2,
+        PauseMenu = 3,
     }
     public abstract class UILayout : UIComponent
     {
@@ -108,22 +127,41 @@ namespace TopDownShooter
         public LevelSelect()
         {
             Vector2 logoPos = new Vector2(729, 98);
-            Vector2 level1Pos = new Vector2(654, 350); // they are offset by 112 pixels horizontally.
+            Vector2 level1Pos = new Vector2(654, 350);
             Vector2 level2Pos = new Vector2(766, 350);
-            Vector2 level3Pos = new Vector2(878, 350);
-            Vector2 level4Pos = new Vector2(990, 350);
+            //Vector2 level3Pos = new Vector2(878, 350);
+            //Vector2 level4Pos = new Vector2(990, 350);
 
 
             Image logo = new Image(logoPos, 1f, Globals.Content.Load<Texture2D>("Title"));
             Button level1 = new Button(level1Pos, 1f, Globals.Content.Load<Texture2D>("Level1Button"), Globals.Content.Load<Texture2D>("Level1ButtonHover"));
             Button level2 = new Button(level2Pos, 1f, Globals.Content.Load<Texture2D>("Level2Button"), Globals.Content.Load<Texture2D>("Level2ButtonHover"));
-            Button level3 = new Button(level3Pos, 1f, Globals.Content.Load<Texture2D>("Level3Button"), Globals.Content.Load<Texture2D>("Level3ButtonHover"));
-            Button level4 = new Button(level4Pos, 1f, Globals.Content.Load<Texture2D>("Level4Button"), Globals.Content.Load<Texture2D>("Level4ButtonHover"));
+            //Button level3 = new Button(level3Pos, 1f, Globals.Content.Load<Texture2D>("Level3Button"), Globals.Content.Load<Texture2D>("Level3ButtonHover"));
+            //Button level4 = new Button(level4Pos, 1f, Globals.Content.Load<Texture2D>("Level4Button"), Globals.Content.Load<Texture2D>("Level4ButtonHover"));
 
-            level1.Click += UI.Level1Wrapper;
-            level2.Click += UI.Level2Wrapper;
+            level1.Click += UI.StartLevel1;
+            level2.Click += UI.StartLevel2;
 
-            Container container = new Container(new Vector2(0, 0), 1f, logo, level1, level2, level3, level4);
+            Container container = new Container(new Vector2(0, 0), 1f, logo, level1, level2);
+            children.Add(container);
+        }
+    }
+    internal sealed class PauseMenu : UILayout
+    {
+        public PauseMenu()
+        {
+            Vector2 resumePos = new Vector2(711, 513);
+            Vector2 backToMenuPos = new Vector2(734, 692);
+            Vector2 logoPos = new Vector2(681, 147);
+
+            Button resumeButton = new Button(resumePos, 1f, Globals.Content.Load<Texture2D>("Resume"), Globals.Content.Load<Texture2D>("ResumeHover"));
+            Button backToMenuButton = new Button(backToMenuPos, 1f, Globals.Content.Load<Texture2D>("BackToMenu"), Globals.Content.Load<Texture2D>("BackToMenuHover"));
+            Image logo = new Image(logoPos, 1f, Globals.Content.Load<Texture2D>("Pause"));
+
+            resumeButton.Click += UI.ResumeButton;
+            backToMenuButton.Click += UI.BackToMenuButton;
+
+            Container container = new Container(new Vector2(0, 0), 1f, resumeButton, backToMenuButton, logo);
             children.Add(container);
         }
     }
