@@ -14,6 +14,7 @@ namespace TopDownShooter
             layouts = new();
 
             layouts[LayoutIndex.MainMenu] = new MainMenu();
+            layouts[LayoutIndex.LevelSelect] = new LevelSelect();
         }
 
         public static void Draw()
@@ -36,19 +37,34 @@ namespace TopDownShooter
                 }
             }
         }
-        public static void OpenMainMenu(object sender, EventArgs e)
+        public static void SwitchToMainMenu(object sender, EventArgs e)
         {
             activeLayout = LayoutIndex.MainMenu;
         }
-        public static void OpenLevelSelect(object sender, EventArgs e)
+        public static void SwitchToLevelSelect(object sender, EventArgs e)
         {
             activeLayout = LayoutIndex.LevelSelect;
+        }
+        public static void SwitchToHUD(object sender, EventArgs e)
+        {
+            activeLayout = LayoutIndex.HUD;
+        }
+        public static void Level1Wrapper(object sender, EventArgs e)
+        {
+            World.ChangeLevel(1);
+            SwitchToHUD(sender, e);
+        }
+        public static void Level2Wrapper(object sender, EventArgs e)
+        {
+            World.ChangeLevel(2);
+            SwitchToHUD(sender, e);
         }
     }
     public enum LayoutIndex
     {
         MainMenu = 0,
         LevelSelect = 1,
+        HUD = 2,
     }
     public abstract class UILayout : UIComponent
     {
@@ -80,10 +96,34 @@ namespace TopDownShooter
             Button exitButton = new Button(exitPos, 1f, Globals.Content.Load<Texture2D>("Exit"), Globals.Content.Load<Texture2D>("ExitHover"));
             Image logo = new Image(logoPos, 1f, Globals.Content.Load<Texture2D>("Title"));
 
-            playButton.Click += UI.OpenLevelSelect;
+            playButton.Click += UI.SwitchToLevelSelect;
             exitButton.Click += Main.instance.ExitWrapper;
 
             Container container = new Container(new Vector2(0,0), 1f, playButton, exitButton, logo);
+            children.Add(container);
+        }
+    }
+    internal sealed class LevelSelect : UILayout
+    {
+        public LevelSelect()
+        {
+            Vector2 logoPos = new Vector2(729, 98);
+            Vector2 level1Pos = new Vector2(654, 350); // they are offset by 112 pixels horizontally.
+            Vector2 level2Pos = new Vector2(766, 350);
+            Vector2 level3Pos = new Vector2(878, 350);
+            Vector2 level4Pos = new Vector2(990, 350);
+
+
+            Image logo = new Image(logoPos, 1f, Globals.Content.Load<Texture2D>("Title"));
+            Button level1 = new Button(level1Pos, 1f, Globals.Content.Load<Texture2D>("Level1Button"), Globals.Content.Load<Texture2D>("Level1ButtonHover"));
+            Button level2 = new Button(level2Pos, 1f, Globals.Content.Load<Texture2D>("Level2Button"), Globals.Content.Load<Texture2D>("Level2ButtonHover"));
+            Button level3 = new Button(level3Pos, 1f, Globals.Content.Load<Texture2D>("Level3Button"), Globals.Content.Load<Texture2D>("Level3ButtonHover"));
+            Button level4 = new Button(level4Pos, 1f, Globals.Content.Load<Texture2D>("Level4Button"), Globals.Content.Load<Texture2D>("Level4ButtonHover"));
+
+            level1.Click += UI.Level1Wrapper;
+            level2.Click += UI.Level2Wrapper;
+
+            Container container = new Container(new Vector2(0, 0), 1f, logo, level1, level2, level3, level4);
             children.Add(container);
         }
     }

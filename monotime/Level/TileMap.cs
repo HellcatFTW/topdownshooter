@@ -30,26 +30,26 @@ namespace TopDownShooter.Level
 
             mapTexture.GetData(colorArray);
 
-            tileIndex = new TileTypes[mapTexture.Height, mapTexture.Width]; // swapped X Y here and in assignments below because map is seemingly flipped
-            hitboxIndex = new HitBox?[mapTexture.Height, mapTexture.Width]; // swapped X Y here and in assignments below because map is seemingly flipped
+            tileIndex = new TileTypes[mapTexture.Width, mapTexture.Height];
+            hitboxIndex = new HitBox?[mapTexture.Width, mapTexture.Height];
 
             for (int x = 0; x < mapTexture.Width; x++)
             {
                 for (int y = 0; y < mapTexture.Height; y++)
                 {
-                    Color currentColor = colorArray[x * mapTexture.Width + y];
+                    Color currentColor = colorArray[y * mapTexture.Width + x];
 
-                    if (currentColor.R <= 50 && currentColor.G >= 200 && currentColor.B <= 50)
+                    if (currentColor.R == 0 && currentColor.G == 255 && currentColor.B == 0) 
                     {
-                        tileIndex[y, x] = TileTypes.Ground;
+                        tileIndex[x, y] = TileTypes.Ground;
                     }
-                    else if (currentColor.R >= 200 && currentColor.G <= 50 && currentColor.B <= 50)
+                    else if (currentColor.R == 255 && currentColor.G == 0 && currentColor.B == 0)
                     {
-                        tileIndex[y, x] = TileTypes.Wall;
+                        tileIndex[x, y] = TileTypes.Wall;
                     }
-                    else if (currentColor.R >= 200 && currentColor.G >= 200 && currentColor.B >= 200)
+                    else if (currentColor.R == 255 && currentColor.G == 255 && currentColor.B == 255)
                     {
-                        tileIndex[y, x] = TileTypes.Air;
+                        tileIndex[x, y] = TileTypes.Air;
                     }
                 }
             }
@@ -87,7 +87,7 @@ namespace TopDownShooter.Level
             {
                 for (int y = 0; y <= tileIndex.GetUpperBound(1); y++)
                 {
-                    Vector2 tilePosition = new Vector2(x * tileHeight, y * tileWidth) - World.cameraPos;
+                    Vector2 tilePosition = new Vector2(x * tileWidth, y * tileHeight) - World.cameraPos;
 
                     switch (tileIndex[x, y])
                     {

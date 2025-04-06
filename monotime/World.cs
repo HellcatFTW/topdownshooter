@@ -8,8 +8,8 @@ namespace TopDownShooter
     public static class World
     {
         public static int level = 1;
-        public static readonly TileMap map = new();
-        public static readonly Player player = new();
+        public static TileMap map;
+        public static Player player;
 
         public static Vector2 cameraPos;
 
@@ -33,6 +33,11 @@ namespace TopDownShooter
             mouseWorld = mouse.Position.ToVector2() + cameraPos;
             mouseScreen = mouse.Position.ToVector2();
 
+            if (player is null || map is null)
+            {
+                return;
+            }
+
             player.Update();
 
             SpawnEnemies();
@@ -47,12 +52,21 @@ namespace TopDownShooter
         }
         public static void Draw()
         {
+            if (player is null || map is null)
+            {
+                return;
+            }
             map.Draw();
             player.Draw();
             DrawEnemies();
             DrawProjectiles();
         }
-
+        public static void ChangeLevel(int newLevel)
+        {
+            level = newLevel;
+            map = new();
+            player = new();
+        }
         private static void SpawnEnemies()
         {
             if (enemySpawnTimer > 0f)
