@@ -30,6 +30,7 @@ namespace TopDownShooter.Entity
             turretOriginOffset = 9f;
 
             position = Vector2.Zero + new Vector2(World.map.Width,World.map.Height) / 2;
+            World.cameraPos = position - new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2);
             rotation = MathHelper.PiOver2;
             hitBox = new HitBox(position, TankHullTexture.Bounds, 0);
         }
