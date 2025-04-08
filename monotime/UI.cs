@@ -235,7 +235,7 @@ namespace TopDownShooter
         {
             if (IsMousedOver())
             {
-                if (Input.MouseLeft)
+                if (Input.MouseLeftJustPressed)
                 {
                     OnClick(EventArgs.Empty);
                 }
