@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace TopDownShooter
 {
-
     public static class UI
     {
         private static Dictionary<LayoutIndex, UILayout> layouts;
@@ -185,7 +184,6 @@ namespace TopDownShooter
     }
     public abstract class UIElement : UIComponent
     {
-        
         public UIElement(Vector2 position, float scale)
         {
             this.position = position;

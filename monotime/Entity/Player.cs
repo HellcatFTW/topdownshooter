@@ -8,7 +8,6 @@ namespace TopDownShooter.Entity
         private readonly Texture2D TankHullTexture;
         private readonly Texture2D TankTurretTexture;
         private readonly float turretOriginOffset;
-        private readonly float turretPositionOffset;
 
         private float turretRotation = 0f;
         private float hullRotation = 0f;

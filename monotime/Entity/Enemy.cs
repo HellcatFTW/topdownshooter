@@ -1,7 +1,4 @@
-﻿
-using TopDownShooter.Level;
-
-namespace TopDownShooter.Entity
+﻿namespace TopDownShooter.Entity
 {
     public abstract class Enemy : Entity, IHealth
     {
