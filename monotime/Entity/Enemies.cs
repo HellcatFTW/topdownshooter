@@ -9,11 +9,13 @@ namespace TopDownShooter.Entity
 
         protected float turretRotation = 0f;
         protected float hullRotation = 0f;
+        private float targetRotation;
 
         protected readonly float shootCooldown;
         protected float shootTimer = 0;
         private Vector2 DirectionToPlayer { get => (World.player.Position - position).SafeNormalize(Vector2.Zero); }
         protected override float MovementSpeed { get; set; } = 1;
+        private const float turnRate = 0.003f;
 
         private const float movementSwitchCooldown = 6f;
         private float movementSwitchTimer = 0;
@@ -74,10 +76,6 @@ namespace TopDownShooter.Entity
         }
         private void AI()
         {
-            turretRotation = DirectionToPlayer.ToRotation() + MathHelper.PiOver2;
-            hullRotation = velocity.ToRotation() + MathHelper.PiOver2;
-            rotation = hullRotation;
-
             if (movementSwitchTimer >= 0)
             {
                 movementSwitchTimer -= (float)Globals.gameTime.ElapsedGameTime.TotalSeconds;
@@ -100,27 +98,32 @@ namespace TopDownShooter.Entity
                     // set movement 90 degrees off directionToPlayer for one frame, don't update
                     if (!movementIsSet)
                     {
-                        velocity = Vector2.Zero;
-                        velocity += DirectionToPlayer.WithRotation(MathHelper.PiOver2).SafeNormalize(Vector2.Zero) * MovementSpeed;
+                        //velocity = DirectionToPlayer.WithRotation(MathHelper.PiOver2).SafeNormalize(Vector2.Zero) * MovementSpeed;
+                        targetRotation = DirectionToPlayer.ToRotation();
                         movementIsSet = true;
                     }
-                
+                    velocity = rotation.ToRotationVector2() * MovementSpeed;
+                    rotation = MathHelper.Lerp(rotation, targetRotation, turnRate);
                     break;
-
+                        
                 case ((int)MovementModes.TowardPlayer):
                     // offset some +-45 degrees from direction to player, don't update
                     if (!movementIsSet)
                     {
-                        velocity = Vector2.Zero;
-                        velocity += DirectionToPlayer.WithRotation(Globals.Random.Next(0, 2) == 0 ? MathHelper.PiOver4 : -MathHelper.PiOver4).SafeNormalize(Vector2.Zero) * MovementSpeed;
+                        //velocity = DirectionToPlayer.WithRotation(Globals.Random.Next(0, 2) == 0 ? MathHelper.PiOver4 : -MathHelper.PiOver4).SafeNormalize(Vector2.Zero) * MovementSpeed;
+                        targetRotation = DirectionToPlayer.WithRotation(Globals.Random.Next(0, 2) == 0 ? MathHelper.PiOver4 : -MathHelper.PiOver4).ToRotation();
                         movementIsSet = true;
                     }
-                
+                    velocity = rotation.ToRotationVector2() * MovementSpeed;
+                    rotation = MathHelper.Lerp(rotation, targetRotation, turnRate);
                     break;
 
                 default:
                     throw new Exception("the movement code!! oh the horror");
             }
+
+            turretRotation = DirectionToPlayer.ToRotation() + MathHelper.PiOver2;
+            hullRotation = rotation + MathHelper.PiOver2;
 
             MoveBy(velocity);
             hitBox.Value.SetHitboxRotation(rotation);
