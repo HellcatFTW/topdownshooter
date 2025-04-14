@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 
 namespace TopDownShooter
@@ -119,7 +120,14 @@ namespace TopDownShooter
         }
         public void DrawString(SpriteFont spriteFont, string text, Vector2 position, Color color)
         {
-            spriteBatch.DrawString(spriteFont, text, position, color);
+            if (beginCalled)
+            {
+                spriteBatch.DrawString(spriteFont, text, position, color);
+            }
+            else
+            {
+                Main.instance.EnqueueDraw(() => spriteBatch.DrawString(spriteFont, text, position, color));
+            }
         }
         public void Draw(Texture2D texture, Vector2 position, Color color)
         {
