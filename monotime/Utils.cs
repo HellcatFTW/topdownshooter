@@ -5,6 +5,7 @@ namespace TopDownShooter
 {
     public static class Utils
     {
+        private static Texture2D pixelTexture;
         #region Float
         public static float ToRotation(this Vector2 v) => (float)Math.Atan2(v.Y, v.X);
         #endregion
@@ -317,7 +318,10 @@ namespace TopDownShooter
             {
                 color = Color.White;
             }
-            Texture2D pixelTexture = GenerateTexture(1, 1, color);
+            if (pixelTexture == null)
+            {
+                pixelTexture = GenerateTexture(1, 1, Color.White);
+            }
             Globals.SpriteBatch.Draw(pixelTexture, position, color);
         }
         public static void DrawText(string text, Vector2 position, Color color = default(Color))

@@ -15,15 +15,15 @@ namespace TopDownShooter
         {
             instance = this;
             graphics = new GraphicsDeviceManager(this);
-            Globals.graphics = graphics;
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
+            IsMouseVisible = false;
             graphics.PreferredBackBufferWidth = 1920;
             graphics.PreferredBackBufferHeight = 1080;
         }
 
         protected override void Initialize()
         {
+            Globals.graphics = graphics;
             Globals.Content = Content;
             Globals.ScreenHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
             Globals.ScreenWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;

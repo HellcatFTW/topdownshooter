@@ -9,8 +9,14 @@ namespace TopDownShooter
         private static LayoutIndex activeLayout = LayoutIndex.MainMenu;
         public static LayoutIndex ActiveLayout { get { return activeLayout; } }
 
+        private static Texture2D cursorTexture;
+        private static Texture2D crosshairTexture;
+
         public static void Initialize()
         {
+            cursorTexture = Globals.Content.Load<Texture2D>("Cursor");
+            crosshairTexture = Globals.Content.Load<Texture2D>("Crosshair");
+
             layouts = new()
             {
                 [LayoutIndex.MainMenu] = new MainMenu(),
@@ -38,6 +44,16 @@ namespace TopDownShooter
                     kvp.Value.Update();
                 }
             }
+
+            if (activeLayout == LayoutIndex.HUD)
+            {
+                Globals.SpriteBatch.Draw(crosshairTexture, World.MouseScreen, Color.White);
+            }
+            else
+            {
+                Globals.SpriteBatch.Draw(cursorTexture, World.MouseScreen, Color.White);
+            }
+
         }
         public static void SwitchToMainMenu(object sender, EventArgs e)
         {
