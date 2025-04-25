@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TopDownShooter.Entity;
 using TopDownShooter.Level;
 
@@ -118,16 +119,23 @@ namespace TopDownShooter
         {
             foreach (Enemy enemy in enemies)
             {
+                if (enemy.Hitbox == null)
+                {
+                    continue;
+                }
                 foreach (Projectile projectile in projectiles)
                 {
-                    if (projectile.IsHostile)
+                    if (projectile.IsHostile || projectile.Hitbox == null)
                     {
                         continue;
                     }
-                    if (enemy.CheckCollisionWith(projectile))
+
+                    Vector2? mtv = HitBox.MinimumTranslationVector(enemy.Hitbox.Value, projectile.Hitbox.Value, out Vector2? MTVStartingPoint, out bool FlipMTVWhenDrawing);
+
+                    if (mtv != null)
                     {
                         enemy.OnHit(projectile);
-                        projectile.Kill();
+                        projectile.Kill(mtv.Value, MTVStartingPoint.Value, FlipMTVWhenDrawing);
                     }
                 }
             }
@@ -136,14 +144,17 @@ namespace TopDownShooter
         {
             foreach (Projectile projectile in projectiles)
             {
-                if (!projectile.IsHostile)
+                if (!projectile.IsHostile || projectile.Hitbox == null)
                 {
                     continue;
                 }
-                if (player.CheckCollisionWith(projectile))
+
+                Vector2? mtv = HitBox.MinimumTranslationVector(player.Hitbox.Value, projectile.Hitbox.Value, out Vector2? MTVStartingPoint, out bool FlipMTVWhenDrawing);
+
+                if (mtv != null)
                 {
                     player.OnHit(projectile);
-                    projectile.Kill();
+                    projectile.Kill(mtv.Value, MTVStartingPoint.Value, FlipMTVWhenDrawing);
                 }
             }
         }
