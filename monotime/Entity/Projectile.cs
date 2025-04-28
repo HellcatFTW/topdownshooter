@@ -45,11 +45,6 @@ namespace TopDownShooter.Entity
 
             return projectile;
         }
-
-        public virtual void Kill()
-        {
-            isActive = false;
-        }
         public virtual void Kill(Vector2 impactNormal, Vector2 startPoint, bool FlipMTVWhenDrawing)
         {
             isActive = false;

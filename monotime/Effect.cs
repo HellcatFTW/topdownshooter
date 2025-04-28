@@ -34,7 +34,7 @@ namespace TopDownShooter
         }
         public virtual void Draw()
         {
-            animatedTexture.Draw(position, rotation, scale, layerDepth);
+            animatedTexture.Draw(position - World.cameraPos, rotation, scale, layerDepth);
         }
         public static T NewEffect<T>(Vector2 position, float rotation, float scale) where T : Effect, new()
         {

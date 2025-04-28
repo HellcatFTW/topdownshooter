@@ -22,7 +22,10 @@ namespace TopDownShooter.Entity
         public abstract void Update();
 
         public abstract void Draw();
-
+        public virtual void Kill()
+        {
+            isActive = false;
+        }
         public virtual void MoveBy(Vector2 vector)
         {
             position += vector;

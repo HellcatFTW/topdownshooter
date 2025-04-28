@@ -26,7 +26,7 @@ namespace TopDownShooter
         private int frame;
 
         private const int frameSpacing = 1;
-        private int frameWidth { get { return (sheet.Width / frameCount) - (frameCount - frameSpacing); } }
+        private int FrameWidth { get { return (sheet.Width - ((frameCount - 1) * frameSpacing)) / frameCount; } }
 
         private bool loop;
         private float timePerFrame { get => (float)1 / fps;  }
@@ -34,7 +34,7 @@ namespace TopDownShooter
         private bool ended;
 
         public Rectangle CurrentFrameRect { get { return CalculateFrameRect(); } }
-        public float Width { get => frameWidth; }
+        public float Width { get => FrameWidth; }
         public float Height { get => sheet.Height;  }
 
         public Texture2DAnimated(Texture2D sheet, int frameCount, float fps, bool loop)
@@ -49,8 +49,7 @@ namespace TopDownShooter
         }
         private Rectangle CalculateFrameRect()
         {
-            int frameWidth = (sheet.Width - (frameCount * frameSpacing)) / frameCount;
-            Rectangle sourcerect = new Rectangle(frameWidth * frame + (frame * frameSpacing), 0, frameWidth, sheet.Height);
+            Rectangle sourcerect = new Rectangle(FrameWidth * frame  + (frame * frameSpacing), 0, FrameWidth, sheet.Height);
             return sourcerect;
         }
         public void Update(GameTime gameTime)
@@ -82,6 +81,10 @@ namespace TopDownShooter
         public void Draw(Vector2 position, float rotation, float scale, float layerDepth)
         {
             Globals.SpriteBatch.Draw(sheet, position, CurrentFrameRect, Color.White, rotation, Vector2.Zero, scale, SpriteEffects.None, layerDepth);
+        }
+        public void Draw(Vector2 position,float rotation, Vector2 origin, float scale, float layerDepth)
+        {
+            Globals.SpriteBatch.Draw(sheet, position, CurrentFrameRect, Color.White, rotation, origin, scale, SpriteEffects.None, layerDepth);
         }
     }
 }

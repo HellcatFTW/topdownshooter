@@ -38,7 +38,7 @@ namespace TopDownShooter.Entity
         {
             if(health <= 0)
             {
-                isActive = false;
+                Kill();
                 return;
             }
             ClearNoPushList();
@@ -67,6 +67,12 @@ namespace TopDownShooter.Entity
             {
                 Utils.DrawHitbox(hitBox.Value);
             }
+        }
+        public override void Kill()
+        {
+            base.Kill();
+            Vector2 hullOrigin = new Vector2(TankHullTexture.Width / 2, TankTurretTexture.Height / 2);
+            Effect.NewEffect<TankExplosion>(position + hullOrigin, 0f, 1f);
         }
         public override void Shoot()
         {

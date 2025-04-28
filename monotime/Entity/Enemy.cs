@@ -11,10 +11,6 @@
         public abstract override void Update();
         public abstract override void Draw();
         public abstract void Shoot();
-        public void Kill()
-        {
-            isActive = false;
-        }
         public static T NewEnemy<T>() where T : Enemy, new()
         {
             Vector2 spawnPosition = World.map.GenerateSpawn();
