@@ -1,4 +1,4 @@
-﻿namespace TopDownShooter.Entity
+﻿namespace TopDownShooter.Entities
 {
     public abstract class Enemy : Entity, IHealth
     {

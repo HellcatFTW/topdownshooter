@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TopDownShooter.Entity
+namespace TopDownShooter.Entities
 {
     public class EnemyTank : Enemy
     {

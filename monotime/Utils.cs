@@ -1,5 +1,5 @@
 ﻿using System;
-using TopDownShooter.Entity;
+using TopDownShooter.Entities;
 
 namespace TopDownShooter
 {

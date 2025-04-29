@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using TopDownShooter.Entity;
+using TopDownShooter.Entities;
 using TopDownShooter.Level;
 
 namespace TopDownShooter
@@ -135,7 +135,7 @@ namespace TopDownShooter
                     if (mtv != null)
                     {
                         enemy.OnHit(projectile);
-                        projectile.Kill(mtv.Value, MTVStartingPoint.Value, FlipMTVWhenDrawing);
+                        projectile.Kill(mtv.Value, MTVStartingPoint.Value, FlipMTVWhenDrawing, new WeakReference<Entity>(enemy));
                     }
                 }
             }
@@ -154,7 +154,7 @@ namespace TopDownShooter
                 if (mtv != null)
                 {
                     player.OnHit(projectile);
-                    projectile.Kill(mtv.Value, MTVStartingPoint.Value, FlipMTVWhenDrawing);
+                    projectile.Kill(mtv.Value, MTVStartingPoint.Value, FlipMTVWhenDrawing, new WeakReference<Entity>(player));
                 }
             }
         }

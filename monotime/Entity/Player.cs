@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 
-namespace TopDownShooter.Entity
+namespace TopDownShooter.Entities
 {
     public sealed class Player : Entity, IHealth
     {

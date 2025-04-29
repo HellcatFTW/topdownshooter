@@ -1,5 +1,7 @@
 ﻿
-namespace TopDownShooter.Entity
+using System;
+
+namespace TopDownShooter.Entities
 {
     public abstract class Projectile : Entity
     {
@@ -46,6 +48,10 @@ namespace TopDownShooter.Entity
             return projectile;
         }
         public virtual void Kill(Vector2 impactNormal, Vector2 startPoint, bool FlipMTVWhenDrawing)
+        {
+            isActive = false;
+        }
+        public virtual void Kill(Vector2 impactNormal, Vector2 startPoint, bool FlipMTVWhenDrawing, WeakReference<Entity> parentWeakRef)
         {
             isActive = false;
         }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TopDownShooter.Entity;
+using TopDownShooter.Entities;
 
 namespace TopDownShooter
 {
@@ -28,7 +28,7 @@ namespace TopDownShooter
         {
             animatedTexture.Update(gameTime);
             if (animatedTexture.Ended)
-            { 
+            {
                 ended = true;
             }
         }
@@ -44,6 +44,13 @@ namespace TopDownShooter
                 rotation = rotation,
                 scale = scale
             };
+            Main.instance.RegisterEffect(effect);
+
+            return effect;
+        }
+        public static ShellExplosion NewEffect(Vector2 position, float rotation, float scale, WeakReference<Entity> parentWeakRef)
+        {
+            ShellExplosion effect = new(position, rotation, scale, parentWeakRef);
             Main.instance.RegisterEffect(effect);
 
             return effect;

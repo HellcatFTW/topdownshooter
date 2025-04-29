@@ -4,7 +4,7 @@ using System;
 using System.Reflection.Metadata;
 using static TopDownShooter.Utils;
 
-namespace TopDownShooter.Entity
+namespace TopDownShooter.Entities
 {
     public abstract class Entity
     {

@@ -1,7 +1,8 @@
 ﻿
+using System;
 using System.Net.NetworkInformation;
 
-namespace TopDownShooter.Entity
+namespace TopDownShooter.Entities
 {
     public sealed class PlayerShell : Projectile
     {
@@ -25,11 +26,11 @@ namespace TopDownShooter.Entity
 
             base.Update();
         }
-        public override void Kill(Vector2 impactNormal, Vector2 startPoint, bool FlipMTVWhenDrawing)
+        public override void Kill(Vector2 impactNormal, Vector2 startPoint, bool FlipMTVWhenDrawing, WeakReference<Entity> parentWeakRef)
         {
             float impactFXRotation = impactNormal.ToRotation() + MathHelper.PiOver2 + (FlipMTVWhenDrawing ? 0 : MathHelper.Pi);
             Vector2 origin = new Vector2(impactFX.Width / 2, impactFX.Height / 2);
-            Effect.NewEffect<ShellExplosion>(startPoint, impactFXRotation, 1f);
+            Effect.NewEffect(startPoint, impactFXRotation, 1f, parentWeakRef);
             base.Kill(impactNormal, startPoint, FlipMTVWhenDrawing);
         }
     }
@@ -55,11 +56,11 @@ namespace TopDownShooter.Entity
 
             base.Update();
         }
-        public override void Kill(Vector2 impactNormal, Vector2 startPoint, bool FlipMTVWhenDrawing)
+        public override void Kill(Vector2 impactNormal, Vector2 startPoint, bool FlipMTVWhenDrawing, WeakReference<Entity> parentWeakRef)
         {
             float impactFXRotation = impactNormal.ToRotation() + MathHelper.PiOver2 + (FlipMTVWhenDrawing ? 0 : MathHelper.Pi);
             Vector2 origin = new Vector2(impactFX.Width / 2, impactFX.Height / 2);
-            Effect.NewEffect<ShellExplosion>(startPoint, impactFXRotation, 1f);
+            Effect.NewEffect(startPoint, impactFXRotation, 1f, parentWeakRef);
             base.Kill(impactNormal, startPoint, FlipMTVWhenDrawing);
         }
     }

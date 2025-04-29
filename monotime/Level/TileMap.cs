@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TopDownShooter.Entity;
+using TopDownShooter.Entities;
 
 namespace TopDownShooter.Level
 {
