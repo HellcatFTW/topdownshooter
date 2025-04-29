@@ -61,14 +61,14 @@ namespace TopDownShooter
                 frame++;
                 if (loop)
                 {
-                    if (frame == frameCount - 1)
+                    if (frame == frameCount)
                     {
                         frame = 0;
                     }
                 }
                 else
                 {
-                    if (frame == frameCount - 1)
+                    if (frame == frameCount)
                     {
                         frame = 0;
                         ended = true;

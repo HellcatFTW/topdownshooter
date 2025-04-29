@@ -18,7 +18,7 @@ namespace TopDownShooter
         Vector2 origin;
         public TankExplosion()
         {
-            animatedTexture = new(Globals.Content.Load<Texture2D>("Explosion"), 7, 15, false);
+            animatedTexture = new(Globals.Content.Load<Texture2D>("Explosion"), 7, 24, false);
             origin = new Vector2(animatedTexture.Width, animatedTexture.Height);
         }
 
