@@ -36,21 +36,28 @@ namespace TopDownShooter
         {
             animatedTexture.Draw(position - World.cameraPos, rotation, scale, layerDepth);
         }
-        public static T NewEffect<T>(Vector2 position, float rotation, float scale) where T : Effect, new()
+        public static T NewEffect<T>(Vector2 position, float rotation, float scale, WeakReference<Entity> parentWeakRef = null) where T : Effect, new()
         {
-            T effect = new()
+            T effect;
+            if (typeof(T) == typeof(ShellExplosion) && parentWeakRef != null)
             {
-                position = position,
-                rotation = rotation,
-                scale = scale
-            };
-            Main.instance.RegisterEffect(effect);
-
-            return effect;
-        }
-        public static ShellExplosion NewEffect(Vector2 position, float rotation, float scale, WeakReference<Entity> parentWeakRef)
-        {
-            ShellExplosion effect = new(position, rotation, scale, parentWeakRef);
+                effect = (T)(Effect)new ShellExplosion()
+                {
+                    position = position,
+                    rotation = rotation,
+                    scale = scale,
+                    ParentWeakRef = parentWeakRef
+                };
+            }
+            else
+            {
+                effect = new()
+                {
+                    position = position,
+                    rotation = rotation,
+                    scale = scale
+                };
+            }
             Main.instance.RegisterEffect(effect);
 
             return effect;

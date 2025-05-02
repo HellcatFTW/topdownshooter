@@ -5,27 +5,31 @@ namespace TopDownShooter
 {
     public sealed class ShellExplosion : Effect
     {
-        private readonly Entity parent;
-        private readonly Vector2 parentOffset;
-        public ShellExplosion(Vector2 position, float rotation, float scale, WeakReference<Entity> parentWeakRef)
-        {
-            animatedTexture = new(Globals.Content.Load<Texture2D>("ShellImpactFX"), 4, 30, false);
-            parentWeakRef.TryGetTarget(out parent);
-            if (parent != null)
+        private Func<Vector2> calculatePosition;
+        private WeakReference<Entity> parentWeakRef;
+        public WeakReference<Entity> ParentWeakRef {
+            get => parentWeakRef;
+            set
             {
-                parentOffset = position - parent.Position;
-            }
-            this.position = parent.Position + parentOffset;
-            this.rotation = rotation;
-            this.scale = scale;
+                parentWeakRef = value;
+                if (parentWeakRef.TryGetTarget(out Entity parent))
+                {
+                    Vector2 parentOffset = position - parent.Position;
+                    calculatePosition = () => parent.Position + parentOffset;
+                }
+                else
+                {
+                    calculatePosition = () => position;
+                }
+            } 
+        }
+        public ShellExplosion()
+        {
+            animatedTexture = new(Globals.Content.Load<Texture2D>("nuke"), 9, 30, false);
         }
         public override void Update(GameTime gameTime)
         {
-            if (parent != null)
-            {
-                position = parent.Position + parentOffset;
-            }
-
+            position = calculatePosition();
             animatedTexture.Update(gameTime);
             if (animatedTexture.Ended)
             {

@@ -27,7 +27,7 @@ namespace TopDownShooter.Entities
         public override void Kill(Vector2 impactNormal, Vector2 startPoint, bool FlipMTVWhenDrawing, WeakReference<Entity> parentWeakRef)
         {
             float impactFXRotation = impactNormal.ToRotation() + MathHelper.PiOver2 + (FlipMTVWhenDrawing ? 0 : MathHelper.Pi);
-            Effect.NewEffect(startPoint, impactFXRotation, 1f, parentWeakRef);
+            Effect.NewEffect<ShellExplosion>(startPoint, impactFXRotation, 1f, parentWeakRef);
             base.Kill(impactNormal, startPoint, FlipMTVWhenDrawing);
         }
     }
@@ -54,7 +54,7 @@ namespace TopDownShooter.Entities
         public override void Kill(Vector2 impactNormal, Vector2 startPoint, bool FlipMTVWhenDrawing, WeakReference<Entity> parentWeakRef)
         {
             float impactFXRotation = impactNormal.ToRotation() + MathHelper.PiOver2 + (FlipMTVWhenDrawing ? 0 : MathHelper.Pi);
-            Effect.NewEffect(startPoint, impactFXRotation, 1f, parentWeakRef);
+            Effect.NewEffect<ShellExplosion>(startPoint, impactFXRotation, 1f, parentWeakRef);
             base.Kill(impactNormal, startPoint, FlipMTVWhenDrawing);
         }
     }
